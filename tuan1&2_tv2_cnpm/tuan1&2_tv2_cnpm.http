@@ -1,0 +1,6 @@
+@tuan1_2_tv2_cnpm_HostAddress = http://localhost:5278
+
+GET {{tuan1_2_tv2_cnpm_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
