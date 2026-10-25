@@ -10,5 +10,8 @@
         public double? Longitude { get; set; }
         public List<string>? Images { get; set; }
         public bool? IsActive { get; set; }
+
+        public double? Radius { get; set; }
+        public string? Narration { get; set; }
     }
 }

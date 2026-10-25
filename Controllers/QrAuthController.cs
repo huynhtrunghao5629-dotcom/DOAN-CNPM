@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using tuan1_2_tv2_cnpm.DTOs;
 
@@ -10,10 +14,13 @@ namespace tuan1_2_tv2_cnpm.Controllers;
 public class QrAuthController : ControllerBase
 {
     private readonly IDistributedCache _cache;
+    private readonly IConfiguration _configuration; // Thêm IConfiguration để đọc appsettings.json
 
-    public QrAuthController(IDistributedCache cache)
+    // Tiêm IConfiguration vào constructor
+    public QrAuthController(IDistributedCache cache, IConfiguration configuration)
     {
         _cache = cache;
+        _configuration = configuration;
     }
 
     // 1. Khởi tạo phiên QR (Trình duyệt gọi khi vào trang đăng nhập)
@@ -83,15 +90,39 @@ public class QrAuthController : ControllerBase
             return BadRequest(new { message = "Mã QR không tồn tại hoặc đã hết hạn." });
         }
 
-        // Tạo JWT Token giả định cho user sau khi quét thành công (hoặc dùng JwtTokenService của bạn)
-        var jwtToken = $"Bearer_Token_For_User_{userId}";
+        // --- TẠO JWT TOKEN CHUẨN XÁC ---
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        // Đọc SecretKey từ file cấu hình (appsettings.json)
+        var secretKey = _configuration["JwtSettings:SecretKey"];
+        if (string.IsNullOrEmpty(secretKey))
+        {
+            return StatusCode(500, new { message = "Lỗi cấu hình Backend: Chưa khai báo JwtSettings:SecretKey" });
+        }
+
+        var key = Encoding.ASCII.GetBytes(secretKey);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Role, "admin") // Gắn quyền admin vào Token
+            }),
+            Expires = DateTime.UtcNow.AddDays(7), // Token có hạn 7 ngày
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+        var jwtToken = tokenHandler.WriteToken(securityToken);
+        // ---------------------------------
 
         var updatedSession = new
         {
             SessionId = dto.SessionId,
             Status = "Approved",
             UserId = userId,
-            Token = jwtToken
+            Token = jwtToken // Lưu token chuẩn vào Redis
         };
 
         // Cập nhật lại trạng thái thành Approved trên Redis (giữ trong 1 phút để trình duyệt kịp lấy token)

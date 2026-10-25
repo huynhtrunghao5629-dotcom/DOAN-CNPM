@@ -36,6 +36,12 @@ namespace HueSmartTourism.Backend.Models
         [BsonElement("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        [BsonElement("radius")]
+        public double? Radius { get; set; } = 50; // Mặc định 50m
+
+        [BsonElement("narration")]
+        public string? Narration { get; set; }
+
         public double AverageRating { get; set; } = 0;
         public int TotalReviews { get; set; } = 0;
     }

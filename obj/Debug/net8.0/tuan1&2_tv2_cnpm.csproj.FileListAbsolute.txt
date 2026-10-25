@@ -63,3 +63,4 @@ D:\tuan1&2_tv2_cnpm\obj\Debug\net8.0\refint\BackendApi.dll
 D:\tuan1&2_tv2_cnpm\obj\Debug\net8.0\BackendApi.pdb
 D:\tuan1&2_tv2_cnpm\obj\Debug\net8.0\tuan1&2_tv2_cnpm.genruntimeconfig.cache
 D:\tuan1&2_tv2_cnpm\obj\Debug\net8.0\ref\BackendApi.dll
+D:\tuan1&2_tv2_cnpm\obj\Debug\net8.0\tuan1&2_tv2_cnpm.sourcelink.json
