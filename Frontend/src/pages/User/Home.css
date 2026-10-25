@@ -1,0 +1,902 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap');
+
+.hue-home {
+  --green: #174f45;
+  --green-dark: #103a34;
+  --orange: #d48d54;
+  --cream: #f8f6f0;
+  --ink: #243b36;
+
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+.hue-home * {
+  box-sizing: border-box;
+}
+
+.hue-home button,
+.hue-home input {
+  font-family: inherit;
+}
+
+.hue-home button {
+  cursor: pointer;
+}
+
+.hue-navbar {
+  min-height: 86px;
+  max-width: 1450px;
+  margin: auto;
+  padding: 16px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: #fff;
+}
+
+.hue-home {
+  background: #fff;
+}
+
+.hue-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--green);
+}
+
+.hue-brand-icon {
+  width: 43px;
+  height: 43px;
+  background: var(--green);
+  color: #fff;
+  border-radius: 12px 12px 12px 3px;
+  display: grid;
+  place-items: center;
+  font: bold 25px 'Playfair Display', serif;
+}
+
+.hue-brand strong {
+  display: block;
+  font-size: 24px;
+  letter-spacing: -1px;
+}
+
+.hue-brand strong span,
+.hue-footer strong span {
+  color: var(--orange);
+}
+
+.hue-brand small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 2px;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.hue-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+
+.hue-nav-links a {
+  color: #53615e;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.hue-nav-links a:hover,
+.hue-nav-links a.selected {
+  color: var(--green);
+}
+
+.hue-nav-map {
+  padding: 13px 20px;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  background: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hue-nav-map span {
+  margin-left: 12px;
+}
+
+/* HERO */
+.hue-hero {
+  min-height: 590px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 85px max(6%, calc((100% - 1280px) / 2));
+  color: #fff;
+  isolation: isolate;
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(15, 42, 37, .94) 0%,
+      rgba(15, 42, 37, .75) 43%,
+      rgba(15, 42, 37, .12) 100%
+    ),
+    url('../../assets/hero.png') center/cover no-repeat,
+    #174f45;
+}
+
+.hue-hero::after {
+  content: '';
+  position: absolute;
+  right: 5%;
+  top: 5%;
+  width: 370px;
+  height: 370px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 50%;
+  z-index: -1;
+  box-shadow:
+    0 0 0 55px rgba(255,255,255,.025),
+    0 0 0 110px rgba(255,255,255,.025);
+}
+
+.hue-hero-content {
+  max-width: 770px;
+  position: relative;
+  z-index: 1;
+}
+
+.hue-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: #edc6a1;
+  letter-spacing: 3px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.hue-eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  background: #e3ab71;
+  border-radius: 50%;
+}
+
+.hue-hero h1 {
+  margin: 27px 0;
+  font: 700 clamp(44px, 5.5vw, 81px)/1.15
+    'Playfair Display', Georgia, serif;
+  letter-spacing: -1.8px;
+}
+
+.hue-hero h1 em {
+  color: #e6b88a;
+  font-weight: 600;
+}
+
+.hue-hero-content > p {
+  max-width: 500px;
+  font-size: 15px;
+  line-height: 1.9;
+  color: #e3e8e3;
+}
+
+.hue-hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.hue-hero-primary,
+.hue-hero-secondary {
+  min-height: 50px;
+  padding: 0 24px;
+  border-radius: 7px;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.hue-hero-primary {
+  background: #e1ad78;
+  color: #263b33;
+  border: 1px solid #e1ad78;
+}
+
+.hue-hero-primary span {
+  margin-left: 24px;
+}
+
+.hue-hero-secondary {
+  background: rgba(255,255,255,.08);
+  color: white;
+  border: 1px solid rgba(255,255,255,.5);
+}
+
+.hue-hero-primary:hover {
+  background: #efc59a;
+}
+
+.hue-hero-secondary:hover {
+  background: rgba(255,255,255,.2);
+}
+
+.hue-hero-bottom {
+  position: absolute;
+  bottom: 25px;
+  left: 6%;
+  right: 6%;
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #d4ded7;
+}
+
+/* STATS */
+.hue-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #f3f1ea;
+  padding: 35px max(6%, calc((100% - 1280px)/2));
+}
+
+.hue-stats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border-right: 1px solid #dcded5;
+}
+
+.hue-stats > div:last-child {
+  border-right: none;
+}
+
+.hue-stats strong {
+  font: bold 37px 'Playfair Display', serif;
+  color: var(--green);
+}
+
+.hue-stats span {
+  color: #6d7772;
+  font-size: 12px;
+}
+
+/* DESTINATIONS */
+.hue-destinations {
+  max-width: 1400px;
+  padding: 100px 6% 110px;
+  margin: auto;
+  scroll-margin-top: 30px;
+}
+
+.hue-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 30px;
+  margin-bottom: 36px;
+}
+
+.hue-section-kicker {
+  color: #b77e51;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+.hue-section-heading h2 {
+  margin: 17px 0 0;
+  font: bold clamp(32px, 3.5vw, 52px)/1.2
+    'Playfair Display', serif;
+  letter-spacing: -1px;
+  color: var(--green-dark);
+}
+
+.hue-section-heading h2 em {
+  color: #be8b60;
+}
+
+.hue-section-heading > p {
+  max-width: 315px;
+  color: #718079;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+/* SEARCH */
+.hue-search-panel {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid #e7e9e2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 35px rgba(20,60,47,.06);
+}
+
+.hue-search-box {
+  flex: 1;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  padding: 0 14px;
+  min-width: 0;
+}
+
+.hue-search-icon {
+  font-size: 31px;
+  color: var(--green);
+}
+
+.hue-search-box input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.hue-search-box input::placeholder {
+  color: #96a09b;
+}
+
+.hue-clear-search {
+  background: none;
+  border: none;
+  font-size: 23px;
+  color: #789;
+}
+
+.hue-search-button {
+  padding: 16px 27px;
+  border: none;
+  border-radius: 9px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.hue-search-button:hover {
+  background: var(--green-dark);
+}
+
+.hue-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 30px 0;
+}
+
+.hue-category-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.hue-filter,
+.hue-favorites-toggle {
+  border: 1px solid #e2e7e2;
+  border-radius: 25px;
+  background: white;
+  padding: 11px 17px;
+  color: #64716a;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all .2s;
+}
+
+.hue-filter span {
+  margin-right: 5px;
+}
+
+.hue-filter.active,
+.hue-filter:hover {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.hue-favorites-toggle.active {
+  color: #be4760;
+  border-color: #f0b5c2;
+  background: #fff1f4;
+}
+
+.hue-results-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid #e9ebe5;
+  padding: 23px 0;
+  color: #8a9790;
+  font-size: 12px;
+}
+
+.hue-results-line strong {
+  color: var(--green);
+}
+
+.hue-results-line > span:last-child {
+  letter-spacing: 1.5px;
+  font-size: 10px;
+}
+
+/* CARDS */
+.hue-poi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 25px;
+}
+
+.hue-poi-card {
+  overflow: hidden;
+  border: 1px solid #edf0eb;
+  border-radius: 14px;
+  background: #fff;
+  transition: transform .25s, box-shadow .25s;
+}
+
+.hue-poi-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(20,55,45,.1);
+}
+
+.hue-poi-visual {
+  height: 235px;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.hue-poi-visual.heritage {
+  background: linear-gradient(135deg, #496654, #b79b70);
+}
+
+.hue-poi-visual.temple {
+  background: linear-gradient(135deg, #64738d, #b69aa5);
+}
+
+.hue-poi-visual.food {
+  background: linear-gradient(135deg, #b86e45, #e1ba83);
+}
+
+.hue-poi-visual.nature {
+  background: linear-gradient(135deg, #397e74, #a3c4a7);
+}
+
+.hue-poi-visual.checkin {
+  background: linear-gradient(135deg, #6c8192, #d4b7a3);
+}
+
+.hue-poi-visual.other {
+  background: linear-gradient(135deg, #718676, #bcad91);
+}
+
+.hue-poi-visual-pattern {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 40px rgba(255,255,255,.07),
+    0 0 0 90px rgba(255,255,255,.04);
+}
+
+.hue-poi-visual-icon {
+  position: relative;
+  font-size: 75px;
+  filter: drop-shadow(0 12px 15px rgba(0,0,0,.18));
+  transition: transform .3s;
+}
+
+.hue-poi-card:hover .hue-poi-visual-icon {
+  transform: scale(1.12);
+}
+
+.hue-poi-card-index {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  color: rgba(255,255,255,.9);
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+.hue-poi-category {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  background: rgba(255,255,255,.93);
+  border-radius: 20px;
+  padding: 7px 13px;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.hue-favorite {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  border: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.95);
+  color: var(--green);
+  font-size: 25px;
+}
+
+.hue-favorite.active {
+  color: #dc526b;
+}
+
+.hue-poi-card-content {
+  padding: 22px;
+}
+
+.hue-poi-location {
+  color: #9a9e96;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.hue-poi-card h3 {
+  margin: 12px 0;
+  font: bold 23px 'Playfair Display', serif;
+  color: var(--green-dark);
+}
+
+.hue-poi-description {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #7b8981;
+  min-height: 70px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hue-poi-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #edf0eb;
+  margin-top: 18px;
+  padding-top: 17px;
+}
+
+.hue-poi-radius {
+  color: #91a097;
+  font-size: 12px;
+}
+
+.hue-poi-detail {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.hue-poi-detail span {
+  margin-left: 7px;
+}
+
+.hue-poi-detail:hover {
+  text-decoration: underline;
+}
+
+.hue-more-wrap {
+  text-align: center;
+  margin-top: 42px;
+}
+
+.hue-more-button,
+.hue-empty button {
+  background: #fff;
+  color: var(--green);
+  border: 1px solid var(--green);
+  padding: 14px 25px;
+  border-radius: 7px;
+  font-weight: 800;
+}
+
+.hue-more-button:hover,
+.hue-empty button:hover {
+  background: var(--green);
+  color: white;
+}
+
+.hue-empty {
+  padding: 80px 20px;
+  background: #f8f9f5;
+  text-align: center;
+  border-radius: 15px;
+}
+
+.hue-empty > span {
+  font-size: 50px;
+}
+
+.hue-empty h3 {
+  color: var(--green);
+}
+
+.hue-empty p {
+  color: #859188;
+}
+
+/* MAP CTA */
+.hue-map-cta {
+  position: relative;
+  background: #16473e;
+  color: #fff;
+  overflow: hidden;
+  padding: 80px max(6%, calc((100% - 1280px)/2));
+  min-height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.hue-map-cta > div:nth-child(2) {
+  position: relative;
+  z-index: 1;
+}
+
+.hue-map-cta-decoration {
+  position: absolute;
+  right: 0;
+  bottom: -160px;
+  font-size: 450px;
+  color: rgba(255,255,255,.03);
+  line-height: 1;
+}
+
+.hue-map-cta span {
+  color: #dfb589;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.hue-map-cta h2 {
+  font: bold clamp(32px, 4vw, 53px)/1.2
+    'Playfair Display', serif;
+  margin: 19px 0;
+}
+
+.hue-map-cta p {
+  max-width: 440px;
+  font-size: 14px;
+  color: #c9d7d0;
+  line-height: 1.9;
+}
+
+.hue-map-cta button {
+  background: #e1ad78;
+  border: none;
+  border-radius: 7px;
+  color: #263b33;
+  padding: 14px 22px;
+  margin-top: 16px;
+  font-weight: 800;
+}
+
+.hue-cta-compass {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hue-cta-compass::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border: 1px dashed rgba(255,255,255,.25);
+  border-radius: 50%;
+}
+
+.hue-cta-compass > div {
+  font-size: 100px;
+  color: #dfb589;
+}
+
+.hue-cta-compass span {
+  font-size: 9px;
+}
+
+/* FOOTER */
+.hue-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  padding: 43px 6%;
+  background: #0e302b;
+  color: white;
+}
+
+.hue-footer strong {
+  font-size: 25px;
+}
+
+.hue-footer p {
+  color: #a4bbb1;
+  font-size: 12px;
+}
+
+.hue-footer-links {
+  display: flex;
+  gap: 23px;
+}
+
+.hue-footer-links a {
+  text-decoration: none;
+  color: #d2e1d9;
+  font-size: 12px;
+}
+
+.hue-footer-links a:hover {
+  color: #e1ad78;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1000px) {
+  .hue-poi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hue-nav-links {
+    gap: 17px;
+  }
+}
+
+@media (max-width: 650px) {
+  .hue-navbar {
+    padding: 16px 5%;
+    gap: 10px;
+  }
+
+  .hue-brand strong {
+    font-size: 20px;
+  }
+
+  .hue-brand small {
+    font-size: 7px;
+  }
+
+  .hue-nav-links {
+    display: none;
+  }
+
+  .hue-nav-map {
+    padding: 12px;
+    font-size: 11px;
+  }
+
+  .hue-hero {
+    min-height: 565px;
+    padding: 60px 6% 85px;
+  }
+
+  .hue-hero h1 {
+    font-size: clamp(40px, 10vw, 57px);
+  }
+
+  .hue-hero-bottom {
+    font-size: 8px;
+  }
+
+  .hue-stats {
+    padding: 25px 12px;
+  }
+
+  .hue-stats strong {
+    font-size: 25px;
+  }
+
+  .hue-stats span {
+    text-align: center;
+    font-size: 10px;
+  }
+
+  .hue-destinations {
+    padding: 65px 5%;
+  }
+
+  .hue-section-heading {
+    display: block;
+  }
+
+  .hue-section-heading > p {
+    max-width: 100%;
+  }
+
+  .hue-search-panel {
+    flex-direction: column;
+  }
+
+  .hue-search-box {
+    min-height: 50px;
+  }
+
+  .hue-search-button {
+    width: 100%;
+  }
+
+  .hue-poi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hue-poi-visual {
+    height: 225px;
+  }
+
+  .hue-results-line > span:last-child {
+    display: none;
+  }
+
+  .hue-map-cta {
+    padding: 65px 6%;
+  }
+
+  .hue-cta-compass {
+    display: none;
+  }
+
+  .hue-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+/* Trang chủ tự mở rộng theo nội dung */
+.hue-home {
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+  overflow: visible;
+}
+
+/* Đảm bảo danh sách di tích không bị cắt */
+.hue-destinations {
+  height: auto;
+  overflow: visible;
+}
+
+}
