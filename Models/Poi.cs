@@ -55,5 +55,14 @@ namespace HueSmartTourism.Backend.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public List<string>? Images { get; set; }
+
+        // Xóa trường string Narration cũ, thay bằng:
+        public Dictionary<string, NarrationContent>? Narrations { get; set; }
+
+        public class NarrationContent
+        {
+            public string Text { get; set; } = null!;
+            public string? AudioUrl { get; set; }
+        }
     }
 }

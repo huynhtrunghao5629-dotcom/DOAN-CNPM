@@ -373,6 +373,49 @@
         }
       }
     },
+    "/api/v1/presence/heartbeat": {
+      "post": {
+        "tags": [
+          "Presence"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeartbeatRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeartbeatRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeartbeatRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/presence": {
+      "get": {
+        "tags": [
+          "Presence"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/auth/qr/generate": {
       "post": {
         "tags": [
@@ -674,6 +717,13 @@
               "type": "string"
             },
             "nullable": true
+          },
+          "narrations": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/NarrationContent"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -686,6 +736,30 @@
             "format": "int32"
           },
           "comment": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "HeartbeatRequestDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NarrationContent": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioUrl": {
             "type": "string",
             "nullable": true
           }
