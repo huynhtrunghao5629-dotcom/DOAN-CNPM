@@ -46,6 +46,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "HueSmartTourism.Backend.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/v1/auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "HueSmartTourism.Backend.Models.UserLoginDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "tuan1_2_tv2_cnpm.Controllers.QrAuthController",
     "Method": "GenerateQrCode",
     "RelativePath": "api/v1/auth/qr/generate",
@@ -67,11 +83,6 @@
         "Name": "dto",
         "Type": "tuan1_2_tv2_cnpm.DTOs.ScanQrRequestDto",
         "IsRequired": true
-      },
-      {
-        "Name": "userId",
-        "Type": "System.String",
-        "IsRequired": false
       }
     ],
     "ReturnTypes": []

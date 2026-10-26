@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HueSmartTourism.Backend.Models;
+using HueSmartTourism.Backend.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -14,13 +18,19 @@ namespace tuan1_2_tv2_cnpm.Controllers;
 public class QrAuthController : ControllerBase
 {
     private readonly IDistributedCache _cache;
-    private readonly IConfiguration _configuration; // Thêm IConfiguration để đọc appsettings.json
+    private readonly IConfiguration _configuration;
 
-    // Tiêm IConfiguration vào constructor
-    public QrAuthController(IDistributedCache cache, IConfiguration configuration)
+    // THÊM DÒNG NÀY ĐỂ HẾT LỖI _users
+    private readonly IMongoCollection<User> _users;
+
+    // Truyền MongoDbService vào constructor
+    public QrAuthController(IDistributedCache cache, IConfiguration configuration, MongoDbService mongoDbService)
     {
         _cache = cache;
         _configuration = configuration;
+
+        // Gọi trực tiếp thuộc tính Users mà bạn đã viết sẵn trong MongoDbService
+        _users = mongoDbService.Users;
     }
 
     // 1. Khởi tạo phiên QR (Trình duyệt gọi khi vào trang đăng nhập)
@@ -79,58 +89,49 @@ public class QrAuthController : ControllerBase
     }
 
     // 3. Ứng dụng di động quét mã và xác nhận phê duyệt đăng nhập
+    [Authorize] // Bắt buộc Mobile App phải có Token hợp lệ mới được quét QR đăng nhập Web
     [HttpPost("scan")]
-    public async Task<IActionResult> ScanAndApprove([FromBody] ScanQrRequestDto dto, [FromQuery] string userId)
+    public async Task<IActionResult> ScanAndApprove([FromBody] ScanQrRequestDto dto)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+        // Kiểm tra IsActive theo Model của bạn
+        if (user == null || !user.IsActive) return Unauthorized(new { message = "User không tồn tại hoặc bị khóa." });
+
         var cacheKey = $"QrSession_{dto.SessionId}";
         var json = await _cache.GetStringAsync(cacheKey);
+        if (string.IsNullOrEmpty(json)) return BadRequest(new { message = "Mã QR không tồn tại hoặc đã hết hạn." });
 
-        if (string.IsNullOrEmpty(json))
-        {
-            return BadRequest(new { message = "Mã QR không tồn tại hoặc đã hết hạn." });
-        }
-
-        // --- TẠO JWT TOKEN CHUẨN XÁC ---
         var tokenHandler = new JwtSecurityTokenHandler();
-
-        // Đọc SecretKey từ file cấu hình (appsettings.json)
-        var secretKey = _configuration["JwtSettings:SecretKey"];
-        if (string.IsNullOrEmpty(secretKey))
-        {
-            return StatusCode(500, new { message = "Lỗi cấu hình Backend: Chưa khai báo JwtSettings:SecretKey" });
-        }
-
-        var key = Encoding.ASCII.GetBytes(secretKey);
-
+        var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]!);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Role, "admin") // Gắn quyền admin vào Token
+                new Claim(ClaimTypes.NameIdentifier, user.Id!),
+                new Claim(ClaimTypes.Role, user.RoleCode) // Ánh xạ RoleCode chuẩn từ DB
             }),
-            Expires = DateTime.UtcNow.AddDays(7), // Token có hạn 7 ngày
+            Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
-
-        var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-        var jwtToken = tokenHandler.WriteToken(securityToken);
-        // ---------------------------------
+        var jwtToken = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
 
         var updatedSession = new
         {
             SessionId = dto.SessionId,
             Status = "Approved",
-            UserId = userId,
-            Token = jwtToken // Lưu token chuẩn vào Redis
+            UserId = user.Id,
+            Token = jwtToken
         };
 
-        // Cập nhật lại trạng thái thành Approved trên Redis (giữ trong 1 phút để trình duyệt kịp lấy token)
         await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(updatedSession), new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
         });
 
-        return Ok(new { message = "Xác nhận đăng nhập thành công trên Web qua mã QR!" });
+        return Ok(new { message = "Xác nhận đăng nhập Web thành công!" });
     }
 }
