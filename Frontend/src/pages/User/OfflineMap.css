@@ -1,0 +1,36 @@
+/* Clear offline map mode, no network tiles required */
+.hue-offline-map-banner {
+  position: absolute;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%);
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(440px, calc(100% - 22px));
+  padding: 10px 14px;
+  color: #19483b;
+  background: rgba(255, 255, 255, .96);
+  border: 1px solid #c1dccb;
+  border-radius: 13px;
+  box-shadow: 0 4px 20px rgba(12, 63, 42, .12);
+  text-align: center;
+  font: 12px/1.45 system-ui, sans-serif;
+  pointer-events: none;
+}
+.hue-offline-map-banner strong { font-size: 13px; }
+@media(max-width: 640px) {
+  .hue-offline-map-banner {
+    bottom: calc(75px + env(safe-area-inset-bottom));
+    left: 10px;
+    transform: none;
+    width: min(250px, calc(100% - 20px));
+    text-align: left;
+    font-size: 10px;
+    padding: 8px 10px;
+  }
+  .hue-offline-map-banner strong { font-size: 11px; }
+}

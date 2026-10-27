@@ -1,0 +1,125 @@
+/* HUẾ GO – giao diện bảng điều khiển bản đồ; không thay đổi logic MapLibre */
+.hue-map-page{position:relative;width:100%;height:100vh;min-height:520px;font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif}
+.hue-map-canvas{width:100%;height:100%}
+.hue-map-sidebar{position:absolute;top:16px;left:16px;z-index:15;width:min(338px,calc(100% - 90px));display:flex;flex-direction:column;gap:12px;max-height:calc(100% - 32px);overflow-y:auto;scrollbar-width:thin}
+.hue-map-panel,.hue-simulator,.hue-map-entered{background:rgba(255,255,255,.97);border:1px solid rgba(31,41,55,.09);border-radius:18px;box-shadow:0 16px 42px rgba(28,37,52,.17);backdrop-filter:blur(12px);color:#1f2937}
+.hue-map-panel{padding:17px}.hue-map-home{display:inline-flex;color:#6d28d9;font-size:13px;font-weight:650;text-decoration:none;margin-bottom:16px}.hue-map-home:hover{text-decoration:underline}
+.hue-map-panel-heading{display:flex;align-items:center;gap:11px;margin-bottom:17px}.hue-map-panel-symbol{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:white;display:grid;place-items:center;font-size:27px;flex:none}
+.hue-map-panel-heading h2{font-size:19px;line-height:1.2;margin:0 0 3px;font-weight:800;color:#17172c}.hue-map-panel-heading p{font-size:12px;color:#6b7280;margin:0;line-height:1.4}
+.hue-map-actions,.hue-simulator-actions,.hue-map-entered-actions{display:flex;gap:9px}.hue-map-actions{margin-bottom:17px}
+.hue-map-page .hue-btn{font:inherit;font-size:12px;font-weight:700;border-radius:11px;border:1px solid transparent;padding:11px 12px;cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:41px}
+.hue-map-page .hue-btn:hover:not(:disabled){transform:translateY(-1px)}.hue-map-page .hue-btn:focus-visible,.hue-map-page .hue-map-select:focus-visible{outline:3px solid rgba(124,58,237,.3);outline-offset:2px}
+.hue-map-page .hue-btn:disabled{cursor:not-allowed;opacity:.45}.hue-map-page .hue-btn-primary{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;box-shadow:0 5px 12px rgba(109,40,217,.19)}
+.hue-map-page .hue-btn-outline{background:#f6f3ff;color:#5b21b6;border-color:#e9ddff}.hue-map-page .hue-btn-active{background:#ede9fe;color:#5b21b6;border-color:#c4b5fd;box-shadow:none}
+.hue-map-actions .hue-btn{flex:1;white-space:nowrap}.hue-map-field-label{display:block;font-size:12px;font-weight:750;color:#374151;margin-bottom:7px}
+.hue-map-select{display:block;box-sizing:border-box;width:100%;padding:11px 12px;border-radius:11px;border:1px solid #dfe2eb;background:#fff;color:#202437;font:inherit;font-size:13px;min-height:42px;margin-bottom:13px}
+.hue-map-status{border-radius:12px;background:#f5f4ff;border:1px solid #e8e5ff;padding:12px}.hue-map-status-top{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:7px}.hue-map-status-label{font-size:12px;color:#5b21b6;font-weight:750;display:flex;align-items:center;gap:6px}.hue-status-dot{width:7px;height:7px;border-radius:100%;background:#8b5cf6}
+.hue-map-status-kind{font-size:10px;font-weight:750;color:#6d28d9;background:#ede9fe;border-radius:20px;padding:4px 7px}.hue-map-status-detail{font-size:12px;line-height:1.55;color:#4b5563}.hue-map-status-detail strong{color:#27253d}
+.hue-map-error,.hue-map-notice{font-size:12px;line-height:1.5;margin:10px 0 0;padding:9px 11px;border-radius:9px}.hue-map-error{color:#a31939;background:#fff1f2}.hue-map-notice{color:#7c520b;background:#fffbeb}
+.hue-simulator{padding:16px}.hue-simulator-heading{display:flex;align-items:center;gap:10px;margin-bottom:16px}.hue-simulator-icon{width:36px;height:36px;display:grid;place-items:center;background:#eff6ff;border-radius:10px;flex:none}.hue-simulator-heading strong{display:block;font-size:15px;color:#1c2540}.hue-simulator-heading p{font-size:11px;color:#6b7280;margin:3px 0 0}.hue-simulator-badge{margin-left:auto;background:#e0f2fe;color:#0369a1;padding:5px 7px;border-radius:6px;font-size:10px;font-weight:800}.hue-simulator-actions .hue-btn:first-child{flex:1}.hue-simulator-tip{font-size:11px;line-height:1.5;color:#6b7280;margin:12px 0 0}
+.hue-map-entered{position:absolute;right:20px;bottom:126px;z-index:20;width:min(365px,calc(100% - 40px));box-sizing:border-box;padding:18px;display:flex;gap:11px}.hue-map-entered-icon{background:#f3e8ff;border-radius:11px;width:38px;height:38px;display:grid;place-items:center;flex:none}.hue-map-entered-content{flex:1;min-width:0}.hue-map-eyebrow{color:#7c3aed;font-size:10px;font-weight:800;letter-spacing:.9px}.hue-map-entered h3{font-size:17px;line-height:1.35;color:#20213a;margin:5px 0}.hue-map-entered p{font-size:12px;line-height:1.6;color:#6b7280;margin:0 0 13px}.hue-map-entered-actions .hue-btn:first-child{flex:1}
+@media(max-width:640px){.hue-map-page{min-height:500px;height:100dvh}.hue-map-sidebar{top:10px;left:10px;width:min(310px,calc(100% - 72px));max-height:min(62vh,490px);gap:8px}.hue-map-panel{padding:12px}.hue-map-home{margin-bottom:10px}.hue-map-panel-heading{margin-bottom:12px}.hue-map-panel-heading h2{font-size:16px}.hue-map-actions{gap:6px;margin-bottom:12px}.hue-map-page .hue-btn{font-size:11px;padding:9px 8px;min-height:38px}.hue-simulator{padding:12px}.hue-map-entered{right:10px;left:10px;bottom:110px;width:auto;padding:13px}.hue-map-entered h3{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.hue-map-page .hue-btn{transition:none}.hue-map-page .hue-btn:hover:not(:disabled){transform:none}}
+
+/* Responsive HUẾ GO – desktop giữ bố cục cũ, mobile ưu tiên diện tích bản đồ. */
+.hue-mobile-toggle{display:none}
+@media (max-width:640px){
+  .hue-map-page{height:100dvh;min-height:0;overflow:hidden}
+  .hue-map-sidebar{top:10px;left:10px;width:min(320px,calc(100% - 74px));max-height:min(66dvh,460px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;gap:8px;scrollbar-width:thin}
+  .hue-map-panel{padding:12px;border-radius:15px}
+  .hue-map-panel-heading{margin:0;gap:9px}
+  .hue-map-panel-symbol{width:35px;height:35px;font-size:22px;border-radius:10px}
+  .hue-map-panel-heading h2{font-size:15px;margin:0 0 2px}
+  .hue-map-panel-heading p{font-size:10px}
+  .hue-mobile-toggle{margin-left:auto;display:grid;place-items:center;flex-shrink:0;width:36px;height:36px;border:1px solid #e8dcff;border-radius:10px;background:#f3edff;color:#6d28d9;font-weight:800;font-size:19px;cursor:pointer}
+  .hue-mobile-toggle:focus-visible{outline:3px solid rgba(124,58,237,.3)}
+  .hue-map-sidebar.is-collapsed .hue-map-home,.hue-map-sidebar.is-collapsed .hue-map-control-details{display:none}
+  .hue-map-sidebar.is-collapsed .hue-map-panel{box-shadow:0 10px 26px rgba(28,37,52,.17)}
+  .hue-map-sidebar.is-collapsed .hue-simulator{display:none}
+  .hue-map-sidebar.is-expanded .hue-map-home{display:inline-flex;font-size:11px;margin-bottom:8px}
+  .hue-map-sidebar.is-expanded .hue-map-panel-heading{margin-bottom:12px}
+  .hue-map-sidebar.is-expanded .hue-map-actions{margin-bottom:10px}
+  .hue-map-sidebar.is-expanded .hue-map-field-label{font-size:11px}
+  .hue-map-sidebar.is-expanded .hue-map-select{min-height:38px;margin-bottom:10px}
+  .hue-map-sidebar.is-expanded .hue-map-status{padding:9px}
+  .hue-map-sidebar.is-simulating .hue-map-status{display:none}
+  .hue-map-page .hue-btn{min-height:40px}
+  .hue-map-entered{left:10px;right:10px;bottom:calc(12px + env(safe-area-inset-bottom));width:auto;max-height:min(50dvh,280px);overflow-y:auto;z-index:25}
+  .hue-map-entered-actions{flex-wrap:wrap}
+  .hue-map-entered-actions .hue-btn{min-width:105px}
+}
+
+/* Bước 1: danh sách di tích custom, không dùng popup select của hệ điều hành. */
+.hue-poi-picker{position:relative;margin-bottom:13px}
+.hue-poi-picker-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:9px;text-align:left;cursor:pointer;background:#fff;border:1px solid #dfe2eb;border-radius:11px;padding:11px 12px;min-height:44px;color:#202437;font:inherit;font-size:13px}
+.hue-poi-picker-trigger[aria-expanded=true]{border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.12)}
+.hue-poi-picker-trigger:focus-visible,.hue-poi-picker-option:focus-visible{outline:3px solid rgba(124,58,237,.3);outline-offset:2px}
+.hue-poi-picker-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hue-poi-picker-arrow{flex-shrink:0;color:#6d28d9}
+/* Nằm trong flow để không tràn viewport 375px, cho phép cuộn nội bộ. */
+.hue-poi-picker-list{list-style:none;padding:5px;margin:6px 0 0;max-height:190px;overflow-y:auto;overscroll-behavior:contain;border:1px solid #e5e1f1;border-radius:12px;background:#fff;box-shadow:0 6px 18px rgba(29,26,64,.1)}
+.hue-poi-picker-option{display:block;width:100%;text-align:left;background:transparent;border:0;border-radius:8px;padding:11px 10px;min-height:40px;color:#263049;cursor:pointer;font:inherit;font-size:13px}
+.hue-poi-picker-option:hover,.hue-poi-picker-option[aria-selected=true]{background:#f0eaff;color:#5b21b6;font-weight:700}
+.hue-poi-picker-empty{padding:10px;color:#6b7280;font-size:12px}
+@media(max-width:640px){
+  .hue-map-sidebar{max-height:min(72dvh,510px)}
+  .hue-map-sidebar.is-collapsed{max-height:none;overflow:visible}
+  .hue-map-sidebar.is-expanded .hue-map-panel-heading{margin-bottom:10px}
+  .hue-map-sidebar.is-expanded.is-simulating .hue-map-status{display:none}
+  .hue-poi-picker-list{max-height:min(170px,26dvh)}
+  .hue-map-entered{max-width:calc(100vw - 20px)}
+}
+
+/* HUẾ GO mobile bottom navigation integration. Map and audio controls stop above the nav. */
+@media (max-width: 767px) {
+  .huego-mobile-layout:has(.hue-map-page) { padding-bottom: 0; }
+  .huego-mobile-layout .hue-map-page {
+    height: calc(100dvh - 80px - env(safe-area-inset-bottom));
+    min-height: 0;
+  }
+  .huego-mobile-layout .hue-map-sidebar {
+    max-height: min(65dvh, calc(100% - 20px));
+  }
+  .huego-mobile-layout .hue-map-entered {
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}
+
+/* HUẾ GO — nút định vị nhanh cho màn hình du khách, không ảnh hưởng desktop. */
+.hue-map-location-fab { display:none; }
+@media (max-width:767px) {
+  .huego-mobile-layout .hue-map-location-fab {
+    position:absolute; z-index:18; right:12px; bottom:18px;
+    display:flex; align-items:center; gap:7px;
+    min-height:46px; padding:9px 13px; border-radius:24px;
+    border:1px solid #ded5fd; background:#fff; color:#5b21b6;
+    font:700 12px Inter,system-ui,sans-serif;
+    box-shadow:0 9px 24px rgba(35,23,76,.22); cursor:pointer;
+  }
+  .huego-mobile-layout .hue-map-location-fab.is-on { background:#6d28d9; color:#fff; border-color:#6d28d9; }
+  .huego-mobile-layout .hue-map-location-fab > span:first-child { font-size:24px; line-height:1; }
+  .huego-mobile-layout .hue-map-location-fab:focus-visible {outline:3px solid #a78bfa;outline-offset:3px;}
+  /* Tránh nút định vị đè lên lời mời phát thuyết minh khi chạm Geofence. */
+  .huego-mobile-layout .hue-map-page:has(.hue-map-entered) .hue-map-location-fab {display:none;}
+  /* Vẫn nhìn thấy nếu thanh điều hướng dưới có safe area kiểu iPhone. */
+  .huego-mobile-layout .hue-map-location-fab {bottom:calc(16px + env(safe-area-inset-bottom));}
+}
+
+/* HUẾ GO – ưu tiên thanh thuyết minh khi đã chọn di tích (mobile).
+   Tránh nút GPS nổi che nút nghe và tránh chồng hộp thoại Geofence. */
+@media (max-width:767px) {
+  .huego-mobile-layout .hue-map-page:has(.hue-audio-player) .hue-map-location-fab { display:none; }
+  .huego-mobile-layout .hue-map-page:has(.hue-audio-player) .hue-map-sidebar { max-height:min(50dvh, 320px); }
+}
+
+/* HUẾ GO Demo UI — bottom sheet, không tác động logic MapLibre */
+.hue-poi-sheet{position:absolute;right:20px;bottom:22px;z-index:28;width:min(395px,calc(100% - 40px));background:rgba(255,255,255,.98);border:1px solid #e3eae5;border-radius:22px;box-shadow:0 18px 55px #183c3433;overflow:hidden;animation:huegoSheetIn .32s cubic-bezier(.2,.7,.2,1) both;color:#20382f}
+.hue-poi-sheet-handle{display:none}.hue-poi-sheet-close{position:absolute;z-index:2;top:11px;right:12px;border:0;border-radius:50%;width:32px;height:32px;background:#fff;box-shadow:0 2px 12px #0002;font-size:24px;cursor:pointer}
+.hue-poi-sheet-photo{height:145px;background:linear-gradient(135deg,#d5e1d6,#b3c6ae)}
+.hue-poi-sheet-photo img{width:100%;height:100%;object-fit:cover}
+.hue-poi-sheet-body{padding:17px 20px 20px}.hue-poi-sheet-kicker{color:#9a6b3e;font-size:10px;font-weight:800;letter-spacing:1.6px}
+.hue-poi-sheet h3{font-size:22px;line-height:1.25;margin:7px 0;color:#174f45}.hue-poi-sheet p{line-height:1.6;font-size:13px;color:#62736b;margin:0 0 15px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hue-poi-sheet-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.hue-poi-sheet-actions .hue-btn-primary{background:#174f45;box-shadow:none}.hue-poi-sheet-detail{font-size:12px;font-weight:800;text-decoration:none;color:#174f45;padding:10px}
+@keyframes huegoSheetIn{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:640px){.hue-poi-sheet{left:9px;right:9px;width:auto;bottom:calc(80px + env(safe-area-inset-bottom));border-radius:22px}.hue-poi-sheet-handle{display:block;width:39px;height:4px;background:#c9d2ce;border-radius:10px;position:absolute;z-index:2;top:9px;left:calc(50% - 19px)}.hue-poi-sheet-photo{height:115px}.hue-poi-sheet-body{padding:13px 16px 17px}.hue-poi-sheet h3{font-size:19px}.hue-poi-sheet p{-webkit-line-clamp:2}.hue-map-page:has(.hue-poi-sheet) .hue-map-location-fab{display:none}}
+@media(prefers-reduced-motion:reduce){.hue-poi-sheet{animation:none}}
