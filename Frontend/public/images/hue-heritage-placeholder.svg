@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" role="img" aria-label="Minh họa kiến trúc Huế">
+<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#b7cfc5"/><stop offset="1" stop-color="#efdec0"/></linearGradient><linearGradient id="river" x2="0" y2="1"><stop stop-color="#789f98"/><stop offset="1" stop-color="#426d65"/></linearGradient></defs>
+<rect width="960" height="620" fill="url(#sky)"/><circle cx="730" cy="144" r="78" fill="#e8c38d" opacity=".72"/>
+<path d="M0 338 Q160 275 320 340 T640 318 T960 329 V620 H0Z" fill="#9aaf93"/><path d="M0 425 Q190 390 360 435 T960 404 V620 H0Z" fill="#769486"/>
+<path d="M0 506 Q260 454 520 520 T960 475 V620 H0Z" fill="url(#river)"/>
+<g transform="translate(260 165)"><path d="M30 215 H410 V305 H30Z" fill="#f0e6cf"/><path d="M0 213 220 110 440 213 410 232 220 155 30 232Z" fill="#435e51"/><path d="M45 204 220 140 395 204" fill="none" stroke="#bd975a" stroke-width="9"/><path d="M65 215 V302 M140 197 V302 M300 197 V302 M375 215 V302" stroke="#946c4c" stroke-width="19"/><path d="M165 218 H275 V305 H165Z" fill="#334e45"/><path d="M0 310 H440" stroke="#b9956a" stroke-width="22"/></g>
+<text x="480" y="585" text-anchor="middle" fill="#fff8df" font-family="serif" font-weight="bold" font-size="26" letter-spacing="7">HUẾ GO · DI SẢN CỐ ĐÔ</text></svg>
