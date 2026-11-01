@@ -223,7 +223,7 @@
     "Parameters": [
       {
         "Name": "dto",
-        "Type": "HueSmartTourism.Backend.Models.CreatePoiDto",
+        "Type": "tuan1_2_tv2_cnpm.DTOs.CreatePoiDto",
         "IsRequired": true
       }
     ],
@@ -260,7 +260,7 @@
       },
       {
         "Name": "dto",
-        "Type": "HueSmartTourism.Backend.Controllers.UpdatePoiDto",
+        "Type": "tuan1_2_tv2_cnpm.DTOs.UpdatePoiDto",
         "IsRequired": true
       }
     ],

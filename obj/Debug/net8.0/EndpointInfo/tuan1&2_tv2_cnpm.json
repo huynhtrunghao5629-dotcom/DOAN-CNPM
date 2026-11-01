@@ -740,11 +740,16 @@
             },
             "nullable": true
           },
-          "narrations": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/NarrationContent"
-            },
+          "isActive": {
+            "type": "boolean"
+          },
+          "radius": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "narration": {
+            "type": "string",
             "nullable": true
           }
         },
@@ -768,20 +773,6 @@
         "type": "object",
         "properties": {
           "sessionId": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "NarrationContent": {
-        "type": "object",
-        "properties": {
-          "text": {
-            "type": "string",
-            "nullable": true
-          },
-          "audioUrl": {
             "type": "string",
             "nullable": true
           }
@@ -836,6 +827,15 @@
           },
           "isActive": {
             "type": "boolean",
+            "nullable": true
+          },
+          "radius": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "narration": {
+            "type": "string",
             "nullable": true
           }
         },

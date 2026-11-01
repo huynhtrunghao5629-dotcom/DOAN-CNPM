@@ -1,10 +1,10 @@
-﻿using HueSmartTourism.Backend.Models;
-using HueSmartTourism.Backend.Services;
+﻿using HueSmartTourism.Backend.Data; // Thêm ApplicationDbContext
+using HueSmartTourism.Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // Thêm EF Core
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -19,21 +19,16 @@ public class QrAuthController : ControllerBase
 {
     private readonly IDistributedCache _cache;
     private readonly IConfiguration _configuration;
+    private readonly ApplicationDbContext _context; // Đổi IMongoCollection thành DbContext
 
-    // THÊM DÒNG NÀY ĐỂ HẾT LỖI _users
-    private readonly IMongoCollection<User> _users;
-
-    // Truyền MongoDbService vào constructor
-    public QrAuthController(IDistributedCache cache, IConfiguration configuration, MongoDbService mongoDbService)
+    public QrAuthController(IDistributedCache cache, IConfiguration configuration, ApplicationDbContext context)
     {
         _cache = cache;
         _configuration = configuration;
-
-        // Gọi trực tiếp thuộc tính Users mà bạn đã viết sẵn trong MongoDbService
-        _users = mongoDbService.Users;
+        _context = context; // Nhận DbContext qua Constructor
     }
 
-    // 1. Khởi tạo phiên QR (Trình duyệt gọi khi vào trang đăng nhập)
+    // 1. Khởi tạo phiên QR
     [HttpPost("generate")]
     public async Task<IActionResult> GenerateQrCode()
     {
@@ -42,31 +37,29 @@ public class QrAuthController : ControllerBase
         var qrSession = new
         {
             SessionId = sessionId,
-            Status = "Pending", // Trạng thái ban đầu chờ quét
+            Status = "Pending",
             UserId = (string?)null,
             Token = (string?)null
         };
 
-        // Cấu hình thời hạn lưu trên Redis là 3 phút (180 giây)
         var options = new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
         };
 
-        // Lưu vào Redis với tiền tố khóa rõ ràng
         await _cache.SetStringAsync($"QrSession_{sessionId}", JsonSerializer.Serialize(qrSession), options);
 
         var response = new QrSessionResponseDto
         {
             SessionId = sessionId,
-            QrContent = $"huetourism://login?sessionId={sessionId}", // Nội dung mã QR để app mobile nhận diện
+            QrContent = $"huetourism://login?sessionId={sessionId}",
             ExpiresInSeconds = 180
         };
 
         return Ok(response);
     }
 
-    // 2. Kiểm tra trạng thái phiên QR (Trình duyệt gọi liên tục - Polling để chờ duyệt)
+    // 2. Kiểm tra trạng thái phiên QR
     [HttpGet("status/{sessionId}")]
     public async Task<IActionResult> CheckQrStatus(string sessionId)
     {
@@ -85,20 +78,20 @@ public class QrAuthController : ControllerBase
             return Ok(new { status = "Approved", token });
         }
 
-        return Ok(new { status = status }); // Trả về trạng thái hiện tại (Pending / Scanned)
+        return Ok(new { status = status });
     }
 
     // 3. Ứng dụng di động quét mã và xác nhận phê duyệt đăng nhập
-    [Authorize] // Bắt buộc Mobile App phải có Token hợp lệ mới được quét QR đăng nhập Web
+    [Authorize]
     [HttpPost("scan")]
     public async Task<IActionResult> ScanAndApprove([FromBody] ScanQrRequestDto dto)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
+        // Đổi cú pháp truy vấn sang LINQ của EF Core
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-        // Kiểm tra IsActive theo Model của bạn
         if (user == null || !user.IsActive) return Unauthorized(new { message = "User không tồn tại hoặc bị khóa." });
 
         var cacheKey = $"QrSession_{dto.SessionId}";
@@ -112,7 +105,7 @@ public class QrAuthController : ControllerBase
             Subject = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id!),
-                new Claim(ClaimTypes.Role, user.RoleCode) // Ánh xạ RoleCode chuẩn từ DB
+                new Claim(ClaimTypes.Role, user.RoleCode)
             }),
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

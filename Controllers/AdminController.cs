@@ -1,33 +1,34 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting; // Bổ sung namespace này
-using MongoDB.Driver;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore; // Thêm thư viện EF Core thay cho MongoDB.Driver
 using HueSmartTourism.Backend.Models;
-using HueSmartTourism.Backend.Services;
+using HueSmartTourism.Backend.Data; // Đổi từ Services sang Data chứa ApplicationDbContext
 
 namespace HueSmartTourism.Backend.Controllers
 {
     [Route("api/v1/admin")]
     [ApiController]
-    [Authorize(Roles = "admin,super_admin")] // Chỉ cho phép admin hoặc super_admin truy cập
-    [EnableRateLimiting("fixed")] // Áp dụng giới hạn tần suất gọi API
+    [Authorize(Roles = "admin,super_admin")]
+    [EnableRateLimiting("fixed")]
     public class AdminController : ControllerBase
     {
-        private readonly MongoDbService _mongoDbService;
+        private readonly ApplicationDbContext _context; // Đổi biến MongoDbService thành ApplicationDbContext
 
-        public AdminController(MongoDbService mongoDbService)
+        public AdminController(ApplicationDbContext context)
         {
-            _mongoDbService = mongoDbService;
+            _context = context;
         }
 
         // 1. Xem thống kê tổng quan (Dashboard Stats)
         [HttpGet("stats")]
         public async Task<IActionResult> GetDashboardStats()
         {
-            var totalPois = await _mongoDbService.Pois.CountDocumentsAsync(_ => true);
-            var totalUsers = await _mongoDbService.Users.CountDocumentsAsync(_ => true);
-            var totalReviews = await _mongoDbService.Reviews.CountDocumentsAsync(_ => true);
-            var totalItineraries = await _mongoDbService.Itineraries.CountDocumentsAsync(_ => true);
+            // Thay CountDocumentsAsync(_ => true) thành CountAsync()
+            var totalPois = await _context.Pois.CountAsync();
+            var totalUsers = await _context.Users.CountAsync();
+            var totalReviews = await _context.Reviews.CountAsync();
+            var totalItineraries = await _context.Itineraries.CountAsync();
 
             return Ok(new
             {
@@ -43,7 +44,8 @@ namespace HueSmartTourism.Backend.Controllers
         [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _mongoDbService.Users.Find(_ => true).ToListAsync();
+            // Thay Find(_ => true).ToListAsync() thành ToListAsync() của EF Core
+            var users = await _context.Users.ToListAsync();
             foreach (var u in users)
             {
                 u.HashedPassword = ""; // Che mật khẩu an toàn
@@ -55,21 +57,23 @@ namespace HueSmartTourism.Backend.Controllers
         [HttpPut("users/{userId}/toggle-status")]
         public async Task<IActionResult> ToggleUserStatus(string userId)
         {
-            var user = await _mongoDbService.Users.Find(u => u.Id == userId).FirstOrDefaultAsync();
+            // Thay Find(u => u.Id == userId).FirstOrDefaultAsync() thành FirstOrDefaultAsync
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
                 return NotFound(new { message = "Không tìm thấy người dùng." });
             }
 
-            // Đảo ngược trạng thái IsActive
-            var newStatus = !user.IsActive;
-            var update = Builders<User>.Update.Set(u => u.IsActive, newStatus);
-            await _mongoDbService.Users.UpdateOneAsync(u => u.Id == userId, update);
+            // Entity Framework quản lý trạng thái tự động, chỉ cần gán giá trị mới
+            user.IsActive = !user.IsActive;
+
+            // Và gọi SaveChangesAsync() để thực thi lệnh UPDATE xuống MySQL
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
-                message = newStatus ? "Đã kích hoạt tài khoản thành công!" : "Đã khóa tài khoản thành công!",
-                isActive = newStatus
+                message = user.IsActive ? "Đã kích hoạt tài khoản thành công!" : "Đã khóa tài khoản thành công!",
+                isActive = user.IsActive
             });
         }
     }

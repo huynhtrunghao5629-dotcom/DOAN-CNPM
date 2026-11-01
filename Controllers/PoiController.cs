@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
+﻿using HueSmartTourism.Backend.Data;
 using HueSmartTourism.Backend.Models;
-using HueSmartTourism.Backend.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using tuan1_2_tv2_cnpm.DTOs;
 
 namespace HueSmartTourism.Backend.Controllers
 {
@@ -10,11 +11,11 @@ namespace HueSmartTourism.Backend.Controllers
     [ApiController]
     public class PoiController : ControllerBase
     {
-        private readonly MongoDbService _mongoDbService;
+        private readonly ApplicationDbContext _context;
 
-        public PoiController(MongoDbService mongoDbService)
+        public PoiController(ApplicationDbContext context)
         {
-            _mongoDbService = mongoDbService;
+            _context = context;
         }
 
         // 1. Lấy danh sách điểm tham quan (Hỗ trợ Search từ khóa, Lọc category, và Phân trang)
@@ -25,34 +26,29 @@ namespace HueSmartTourism.Backend.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
-            var filterBuilder = Builders<Poi>.Filter;
-            var filter = filterBuilder.Eq(p => p.IsActive, true);
+            var query = _context.Pois.Where(p => p.IsActive);
 
-            // Tìm kiếm theo từ khóa (Khớp trong Tên hoặc Mô tả, không phân biệt hoa thường)
+            // Tìm kiếm theo từ khóa (Khớp trong Tên hoặc Mô tả)
             if (!string.IsNullOrEmpty(search))
             {
-                var searchFilter = filterBuilder.Regex(p => p.Name, new MongoDB.Bson.BsonRegularExpression(search, "i")) |
-                                   filterBuilder.Regex(p => p.Description, new MongoDB.Bson.BsonRegularExpression(search, "i"));
-                filter &= searchFilter;
+                // Dùng .Contains thay cho Regex của MongoDB
+                query = query.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
             }
 
             // Lọc theo danh mục
             if (!string.IsNullOrEmpty(category))
             {
-                filter &= filterBuilder.Eq(p => p.Category, category);
+                query = query.Where(p => p.Category == category);
             }
 
-            // Đếm tổng số lượng bản ghi thỏa mãn điều kiện
-            var totalItems = await _mongoDbService.Pois.CountDocumentsAsync(filter);
-
-            // Thực hiện phân trang (Skip & Limit)
+            var totalItems = await query.CountAsync();
             var skip = (page - 1) * pageSize;
-            var pois = await _mongoDbService.Pois.Find(filter)
+
+            var pois = await query
                 .Skip(skip)
-                .Limit(pageSize)
+                .Take(pageSize) // Dùng Take thay cho Limit
                 .ToListAsync();
 
-            // Trả về kết quả kèm thông tin phân trang
             return Ok(new
             {
                 totalItems = totalItems,
@@ -67,7 +63,7 @@ namespace HueSmartTourism.Backend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPoiById(string id)
         {
-            var poi = await _mongoDbService.Pois.Find(p => p.Id == id && p.IsActive).FirstOrDefaultAsync();
+            var poi = await _context.Pois.FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
             if (poi == null) return NotFound(new { message = "Không tìm thấy điểm tham quan" });
             return Ok(poi);
         }
@@ -88,7 +84,8 @@ namespace HueSmartTourism.Backend.Controllers
                 Images = dto.Images ?? new List<string>()
             };
 
-            await _mongoDbService.Pois.InsertOneAsync(newPoi);
+            _context.Pois.Add(newPoi);
+            await _context.SaveChangesAsync();
             return StatusCode(201, newPoi);
         }
 
@@ -97,15 +94,13 @@ namespace HueSmartTourism.Backend.Controllers
         [Authorize(Roles = "admin,super_admin,poi_owner")]
         public async Task<IActionResult> UpdatePoi(string id, [FromBody] UpdatePoiDto dto)
         {
-            var filter = Builders<Poi>.Filter.Eq(p => p.Id, id);
-            var existingPoi = await _mongoDbService.Pois.Find(filter).FirstOrDefaultAsync();
+            var existingPoi = await _context.Pois.FirstOrDefaultAsync(p => p.Id == id);
 
             if (existingPoi == null)
             {
                 return NotFound(new { message = "Không tìm thấy điểm tham quan" });
             }
 
-            // Cập nhật các trường dữ liệu nếu được truyền lên
             if (!string.IsNullOrEmpty(dto.Name)) existingPoi.Name = dto.Name;
             if (!string.IsNullOrEmpty(dto.Category)) existingPoi.Category = dto.Category;
             if (!string.IsNullOrEmpty(dto.Description)) existingPoi.Description = dto.Description;
@@ -115,7 +110,7 @@ namespace HueSmartTourism.Backend.Controllers
             if (dto.Images != null) existingPoi.Images = dto.Images;
             if (dto.IsActive.HasValue) existingPoi.IsActive = dto.IsActive.Value;
 
-            await _mongoDbService.Pois.ReplaceOneAsync(filter, existingPoi);
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
@@ -129,12 +124,15 @@ namespace HueSmartTourism.Backend.Controllers
         [Authorize(Roles = "admin,super_admin,poi_owner")]
         public async Task<IActionResult> DeletePoi(string id)
         {
-            var result = await _mongoDbService.Pois.DeleteOneAsync(p => p.Id == id);
+            var poi = await _context.Pois.FirstOrDefaultAsync(p => p.Id == id);
 
-            if (result.DeletedCount == 0)
+            if (poi == null)
             {
                 return NotFound(new { message = "Không tìm thấy điểm tham quan để xóa" });
             }
+
+            _context.Pois.Remove(poi);
+            await _context.SaveChangesAsync();
 
             return Ok(new { message = "Xóa điểm tham quan thành công" });
         }
@@ -156,8 +154,7 @@ namespace HueSmartTourism.Backend.Controllers
                 return BadRequest(new { message = "Chỉ chấp nhận các định dạng ảnh (.jpg, .jpeg, .png, .webp)." });
             }
 
-            var filter = Builders<Poi>.Filter.Eq(p => p.Id, id);
-            var existingPoi = await _mongoDbService.Pois.Find(filter).FirstOrDefaultAsync();
+            var existingPoi = await _context.Pois.FirstOrDefaultAsync(p => p.Id == id);
             if (existingPoi == null)
             {
                 return NotFound(new { message = "Không tìm thấy điểm tham quan." });
@@ -182,7 +179,7 @@ namespace HueSmartTourism.Backend.Controllers
             existingPoi.Images ??= new List<string>();
             existingPoi.Images.Add(imageUrl);
 
-            await _mongoDbService.Pois.ReplaceOneAsync(filter, existingPoi);
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
@@ -191,18 +188,5 @@ namespace HueSmartTourism.Backend.Controllers
                 data = existingPoi
             });
         }
-    }
-
-    // DTO phục vụ cho việc cập nhật POI
-    public class UpdatePoiDto
-    {
-        public string? Name { get; set; }
-        public string? Category { get; set; }
-        public string? Description { get; set; }
-        public string? Address { get; set; }
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
-        public List<string>? Images { get; set; }
-        public bool? IsActive { get; set; }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore; // Thêm EF Core
 using HueSmartTourism.Backend.Models;
-using HueSmartTourism.Backend.Services;
+using HueSmartTourism.Backend.Data; // Thêm ApplicationDbContext
 using System.Security.Claims;
 using BCrypt.Net;
 
@@ -13,11 +13,11 @@ namespace HueSmartTourism.Backend.Controllers
     [Authorize] // Yêu cầu đăng nhập token
     public class UserController : ControllerBase
     {
-        private readonly MongoDbService _mongoDbService;
+        private readonly ApplicationDbContext _context; // Đổi MongoDbService thành ApplicationDbContext
 
-        public UserController(MongoDbService mongoDbService)
+        public UserController(ApplicationDbContext context)
         {
-            _mongoDbService = mongoDbService;
+            _context = context;
         }
 
         // 1. Lấy thông tin cá nhân (Profile)
@@ -30,7 +30,7 @@ namespace HueSmartTourism.Backend.Controllers
                 return Unauthorized(new { message = "Không xác định được danh tính người dùng." });
             }
 
-            var user = await _mongoDbService.Users.Find(u => u.Id == userId).FirstOrDefaultAsync();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
                 return NotFound(new { message = "Người dùng không tồn tại." });
@@ -59,17 +59,18 @@ namespace HueSmartTourism.Backend.Controllers
                 return Unauthorized(new { message = "Không xác định được danh tính người dùng." });
             }
 
-            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
-            var update = Builders<User>.Update
-                .Set(u => u.FullName, dto.FullName)
-                .Set(u => u.PhoneNumber, dto.PhoneNumber ?? string.Empty);
-
-            var result = await _mongoDbService.Users.UpdateOneAsync(filter, update);
-
-            if (result.MatchedCount == 0)
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
             {
                 return NotFound(new { message = "Người dùng không tồn tại." });
             }
+
+            // Gán giá trị mới
+            user.FullName = dto.FullName;
+            user.PhoneNumber = dto.PhoneNumber ?? string.Empty;
+
+            // EF Core sẽ tự ghi nhận thay đổi và thực thi lệnh UPDATE trong MySQL
+            await _context.SaveChangesAsync();
 
             return Ok(new { message = "Cập nhật thông tin cá nhân thành công!" });
         }
@@ -84,7 +85,7 @@ namespace HueSmartTourism.Backend.Controllers
                 return Unauthorized(new { message = "Không xác định được danh tính người dùng." });
             }
 
-            var user = await _mongoDbService.Users.Find(u => u.Id == userId).FirstOrDefaultAsync();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
                 return NotFound(new { message = "Người dùng không tồn tại." });
@@ -98,10 +99,9 @@ namespace HueSmartTourism.Backend.Controllers
             }
 
             // Hash mật khẩu mới và lưu vào DB
-            string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-            var update = Builders<User>.Update.Set(u => u.HashedPassword, newPasswordHash);
+            user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
 
-            await _mongoDbService.Users.UpdateOneAsync(u => u.Id == userId, update);
+            await _context.SaveChangesAsync();
 
             return Ok(new { message = "Đổi mật khẩu thành công!" });
         }

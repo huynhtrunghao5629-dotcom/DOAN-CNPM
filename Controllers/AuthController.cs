@@ -1,10 +1,8 @@
-﻿using Amazon.Runtime.Internal.Util;
-using HueSmartTourism.Backend.Models; // Dùng đúng namespace của bạn
-using HueSmartTourism.Backend.Services;
+﻿using HueSmartTourism.Backend.Data; // Thêm namespace chứa ApplicationDbContext
+using HueSmartTourism.Backend.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.EntityFrameworkCore; // Thêm namespace EF Core
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -15,19 +13,20 @@ namespace HueSmartTourism.Backend.Controllers;
 [Route("api/v1/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly IMongoCollection<User> _users;
+    private readonly ApplicationDbContext _context; // Đổi sang ApplicationDbContext
     private readonly IConfiguration _configuration;
 
-    public AuthController(MongoDbService mongoDbService, IConfiguration configuration)
+    public AuthController(ApplicationDbContext context, IConfiguration configuration)
     {
-        _users = mongoDbService.Users;
+        _context = context;
         _configuration = configuration;
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] UserLoginDto request) // Đổi thành UserLoginDto
+    public async Task<IActionResult> Login([FromBody] UserLoginDto request)
     {
-        var user = await _users.Find(u => u.Email == request.Email).FirstOrDefaultAsync();
+        // Truy vấn MySQL bằng EF Core
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
         // Kiểm tra user có tồn tại, có đang Active không, và verify mật khẩu BCrypt
         if (user == null || !user.IsActive || !BCrypt.Net.BCrypt.Verify(request.Password, user.HashedPassword))
@@ -55,7 +54,7 @@ public class AuthController : ControllerBase
             Subject = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id!),
-                new Claim(ClaimTypes.Role, user.RoleCode) // Dùng RoleCode từ Model của bạn
+                new Claim(ClaimTypes.Role, user.RoleCode)
             }),
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore; // Thêm EF Core
 using HueSmartTourism.Backend.Models;
-using HueSmartTourism.Backend.Services;
+using HueSmartTourism.Backend.Data; // Thêm ApplicationDbContext
 using System.Security.Claims;
 
 namespace HueSmartTourism.Backend.Controllers
@@ -11,20 +11,21 @@ namespace HueSmartTourism.Backend.Controllers
     [ApiController]
     public class ReviewController : ControllerBase
     {
-        private readonly MongoDbService _mongoDbService;
+        private readonly ApplicationDbContext _context; // Đổi MongoDbService thành ApplicationDbContext
 
-        public ReviewController(MongoDbService mongoDbService)
+        public ReviewController(ApplicationDbContext context)
         {
-            _mongoDbService = mongoDbService;
+            _context = context;
         }
 
         // 1. Lấy danh sách đánh giá của một POI (Ai cũng xem được)
         [HttpGet]
         public async Task<IActionResult> GetReviewsByPoiId(string poiId)
         {
-            var reviews = await _mongoDbService.Reviews
-                .Find(r => r.PoiId == poiId)
-                .SortByDescending(r => r.CreatedAt)
+            // Đổi cú pháp truy vấn
+            var reviews = await _context.Reviews
+                .Where(r => r.PoiId == poiId)
+                .OrderByDescending(r => r.CreatedAt) // Đổi SortByDescending thành OrderByDescending
                 .ToListAsync();
 
             return Ok(reviews);
@@ -40,9 +41,8 @@ namespace HueSmartTourism.Backend.Controllers
                 return BadRequest(new { message = "Số sao đánh giá phải từ 1 đến 5." });
             }
 
-            // Kiểm tra POI có tồn tại không
-            var poiFilter = Builders<Poi>.Filter.Eq(p => p.Id, poiId);
-            var poi = await _mongoDbService.Pois.Find(poiFilter).FirstOrDefaultAsync();
+            // Đổi cú pháp truy vấn EF Core
+            var poi = await _context.Pois.FirstOrDefaultAsync(p => p.Id == poiId);
             if (poi == null)
             {
                 return NotFound(new { message = "Không tìm thấy điểm tham quan." });
@@ -68,14 +68,19 @@ namespace HueSmartTourism.Backend.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _mongoDbService.Reviews.InsertOneAsync(review);
+            // Dùng Add thay cho InsertOneAsync
+            _context.Reviews.Add(review);
 
-            // Tính toán lại điểm trung bình (AverageRating) và tổng số review cho POI
-            var allReviews = await _mongoDbService.Reviews.Find(r => r.PoiId == poiId).ToListAsync();
+            // Cập nhật điểm cho Poi
+            var allReviews = await _context.Reviews.Where(r => r.PoiId == poiId).ToListAsync();
+            // Cộng thêm review hiện tại vì nó chưa được lưu vào DB (SaveChanges chưa chạy)
+            allReviews.Add(review);
+
             poi.TotalReviews = allReviews.Count;
             poi.AverageRating = Math.Round(allReviews.Average(r => r.Rating), 1);
 
-            await _mongoDbService.Pois.ReplaceOneAsync(poiFilter, poi);
+            // Chỉ cần gọi 1 lệnh SaveChangesAsync để lưu cả Review và Poi cùng lúc
+            await _context.SaveChangesAsync();
 
             return StatusCode(201, new
             {

@@ -1,68 +1,39 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using System.ComponentModel.DataAnnotations;
+// Xóa bỏ hoàn toàn using MongoDB.Bson và MongoDB.Bson.Serialization.Attributes
 
 namespace HueSmartTourism.Backend.Models
 {
     public class Poi
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }
+        [Key] // Đánh dấu đây là Khóa chính (Primary Key) cho MySQL
+        public string Id { get; set; } = Guid.NewGuid().ToString(); // Tự động sinh ID duy nhất thay vì dùng ObjectId của Mongo
 
-        [BsonElement("name")]
+        [Required]
         public string Name { get; set; } = null!; // Tên địa điểm (VD: Đại Nội Huế)
 
-        [BsonElement("category")]
+        [Required]
         public string Category { get; set; } = null!; // Danh mục: "Di tích", "Ẩm thực", "Khách sạn"...
 
-        [BsonElement("description")]
         public string Description { get; set; } = null!; // Mô tả chi tiết
 
-        [BsonElement("address")]
         public string Address { get; set; } = null!; // Địa chỉ
 
-        [BsonElement("latitude")]
         public double Latitude { get; set; } // Tọa độ Vĩ độ
 
-        [BsonElement("longitude")]
         public double Longitude { get; set; } // Tọa độ Kinh độ
 
-        [BsonElement("images")]
+        // Với .NET 8, Entity Framework sẽ tự động ánh xạ List<string> thành cột định dạng JSON trong MySQL
         public List<string> Images { get; set; } = new(); // Danh sách link hình ảnh
 
-        [BsonElement("is_active")]
         public bool IsActive { get; set; } = true;
 
-        [BsonElement("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [BsonElement("radius")]
         public double? Radius { get; set; } = 50; // Mặc định 50m
 
-        [BsonElement("narration")]
         public string? Narration { get; set; }
 
         public double AverageRating { get; set; } = 0;
         public int TotalReviews { get; set; } = 0;
-    }
-
-    public class CreatePoiDto
-    {
-        public string Name { get; set; } = null!;
-        public string Category { get; set; } = null!;
-        public string Description { get; set; } = null!;
-        public string Address { get; set; } = null!;
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        public List<string>? Images { get; set; }
-
-        // Xóa trường string Narration cũ, thay bằng:
-        public Dictionary<string, NarrationContent>? Narrations { get; set; }
-
-        public class NarrationContent
-        {
-            public string Text { get; set; } = null!;
-            public string? AudioUrl { get; set; }
-        }
     }
 }

@@ -1,22 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore; // Dùng EF Core thay MongoDB
 using HueSmartTourism.Backend.Models;
-using HueSmartTourism.Backend.Services;
+using HueSmartTourism.Backend.Data; // Thêm ApplicationDbContext
 using System.Security.Claims;
 
 namespace HueSmartTourism.Backend.Controllers
 {
     [Route("api/v1/itineraries")]
     [ApiController]
-    [Authorize] // Yêu cầu đăng nhập
+    [Authorize]
     public class ItineraryController : ControllerBase
     {
-        private readonly MongoDbService _mongoDbService;
+        private readonly ApplicationDbContext _context;
 
-        public ItineraryController(MongoDbService mongoDbService)
+        public ItineraryController(ApplicationDbContext context)
         {
-            _mongoDbService = mongoDbService;
+            _context = context;
         }
 
         // 1. Tạo chuyến đi mới
@@ -39,7 +39,8 @@ namespace HueSmartTourism.Backend.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _mongoDbService.Itineraries.InsertOneAsync(itinerary);
+            _context.Itineraries.Add(itinerary);
+            await _context.SaveChangesAsync();
 
             return StatusCode(201, new { message = "Tạo lịch trình thành công!", data = itinerary });
         }
@@ -54,9 +55,9 @@ namespace HueSmartTourism.Backend.Controllers
                 return Unauthorized(new { message = "Không xác định được danh tính người dùng." });
             }
 
-            var itineraries = await _mongoDbService.Itineraries
-                .Find(i => i.UserId == userId)
-                .SortByDescending(i => i.CreatedAt)
+            var itineraries = await _context.Itineraries
+                .Where(i => i.UserId == userId)
+                .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
 
             return Ok(itineraries);
@@ -67,7 +68,7 @@ namespace HueSmartTourism.Backend.Controllers
         public async Task<IActionResult> GetItineraryById(string id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var itinerary = await _mongoDbService.Itineraries.Find(i => i.Id == id && i.UserId == userId).FirstOrDefaultAsync();
+            var itinerary = await _context.Itineraries.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
 
             if (itinerary == null)
             {
@@ -76,7 +77,7 @@ namespace HueSmartTourism.Backend.Controllers
 
             // Lấy thông tin chi tiết của các POI có trong lịch trình
             var poiIds = itinerary.Items.Select(item => item.PoiId).Distinct().ToList();
-            var pois = await _mongoDbService.Pois.Find(p => poiIds.Contains(p.Id)).ToListAsync();
+            var pois = await _context.Pois.Where(p => poiIds.Contains(p.Id)).ToListAsync();
 
             var poiDictionary = pois.ToDictionary(p => p.Id!);
 
@@ -104,15 +105,14 @@ namespace HueSmartTourism.Backend.Controllers
         public async Task<IActionResult> AddPoiToItinerary(string id, [FromBody] AddPoiToItineraryDto dto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var itinerary = await _mongoDbService.Itineraries.Find(i => i.Id == id && i.UserId == userId).FirstOrDefaultAsync();
+            var itinerary = await _context.Itineraries.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
 
             if (itinerary == null)
             {
                 return NotFound(new { message = "Không tìm thấy lịch trình." });
             }
 
-            // Kiểm tra POI có tồn tại không
-            var poiExists = await _mongoDbService.Pois.Find(p => p.Id == dto.PoiId && p.IsActive).AnyAsync();
+            var poiExists = await _context.Pois.AnyAsync(p => p.Id == dto.PoiId && p.IsActive);
             if (!poiExists)
             {
                 return NotFound(new { message = "Không tìm thấy điểm tham quan." });
@@ -126,8 +126,8 @@ namespace HueSmartTourism.Backend.Controllers
                 VisitTime = dto.VisitTime
             };
 
-            var update = Builders<Itinerary>.Update.Push(i => i.Items, newItem);
-            await _mongoDbService.Itineraries.UpdateOneAsync(i => i.Id == id, update);
+            itinerary.Items.Add(newItem);
+            await _context.SaveChangesAsync();
 
             return Ok(new { message = "Đã thêm điểm tham quan vào lịch trình thành công!" });
         }
@@ -137,12 +137,15 @@ namespace HueSmartTourism.Backend.Controllers
         public async Task<IActionResult> DeleteItinerary(string id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var result = await _mongoDbService.Itineraries.DeleteOneAsync(i => i.Id == id && i.UserId == userId);
+            var itinerary = await _context.Itineraries.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
 
-            if (result.DeletedCount == 0)
+            if (itinerary == null)
             {
                 return NotFound(new { message = "Không tìm thấy lịch trình hoặc bạn không có quyền xóa." });
             }
+
+            _context.Itineraries.Remove(itinerary);
+            await _context.SaveChangesAsync();
 
             return Ok(new { message = "Đã xóa lịch trình thành công!" });
         }
