@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "dai-noi",
+    "place": "Đại Nội Huế",
+    "commons_file": "Ngọ môn, Huế.jpg",
+    "author": "Bùi Thụy Đào Nguyên",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ngọ_môn,_Huế.jpg"
+  },
+  {
+    "slug": "thien-mu",
+    "place": "Chùa Thiên Mụ",
+    "commons_file": "ThienMuPagoda.jpg",
+    "author": "Lưu Ly",
+    "license": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:ThienMuPagoda.jpg"
+  },
+  {
+    "slug": "tu-duc",
+    "place": "Lăng Tự Đức",
+    "commons_file": "Tomb of Tu Duc.jpg",
+    "author": "AJ Oswald",
+    "license": "CC BY-SA 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Tomb_of_Tu_Duc.jpg"
+  },
+  {
+    "slug": "khai-dinh",
+    "place": "Lăng Khải Định",
+    "commons_file": "Khai Dinh tomb (38834468154).jpg",
+    "author": "dronepicr",
+    "license": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Khai_Dinh_tomb_(38834468154).jpg"
+  },
+  {
+    "slug": "minh-mang",
+    "place": "Lăng Minh Mạng",
+    "commons_file": "Minh Mạng mausoleum.jpg",
+    "author": "Tim Hill",
+    "license": "CC BY-SA 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Minh_Mạng_mausoleum.jpg"
+  },
+  {
+    "slug": "gia-long",
+    "place": "Lăng Gia Long",
+    "commons_file": "Hue Vietnam Tomb-of-Emperor-Gia-Long-07.jpg",
+    "author": "CEphoto, Uwe Aranas",
+    "license": "License: kiểm tra trên trang ảnh trước khi phát hành",
+    "source": "https://commons.wikimedia.org/wiki/File:Hue_Vietnam_Tomb-of-Emperor-Gia-Long-07.jpg"
+  },
+  {
+    "slug": "nam-giao",
+    "place": "Đàn Nam Giao",
+    "commons_file": "Dan Nam Giao Hue.jpg",
+    "author": "Wikimedia Commons contributor",
+    "license": "License: kiểm tra trên trang ảnh trước khi phát hành",
+    "source": "https://commons.wikimedia.org/wiki/File:Dan_Nam_Giao_Hue.jpg"
+  }
+]

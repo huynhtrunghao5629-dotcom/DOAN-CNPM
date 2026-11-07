@@ -1,0 +1,50 @@
+/* Mobile-only navigation; desktop admin is unaffected. */
+.huego-mobile-nav { display: none; }
+
+@media (max-width: 767px) {
+  .huego-mobile-nav {
+    position: fixed;
+    z-index: 2000;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    min-height: 64px;
+    padding: 4px 8px max(7px, env(safe-area-inset-bottom));
+    background: rgba(255,255,255,.97);
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -7px 24px rgba(13,44,39,.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .huego-mobile-nav__item {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    min-height: 48px;
+    gap: 3px;
+    color: #63746d;
+    text-decoration: none;
+    border-radius: 12px;
+    font: 600 11px/1.25 Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .huego-mobile-nav__item.is-active {
+    color: #146b55;
+    background: #eaf5ef;
+  }
+  .huego-mobile-nav__item:focus-visible {
+    outline: 3px solid #b58a55;
+    outline-offset: -3px;
+  }
+  .huego-mobile-nav__icon { font-size: 23px; line-height: 1; }
+  .huego-mobile-nav__label { white-space: nowrap; }
+
+  /* Apply this class to UserLayout's OUTERMOST wrapper to avoid hiding content. */
+  .huego-mobile-layout { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+}
