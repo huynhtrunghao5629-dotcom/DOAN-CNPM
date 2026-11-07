@@ -1,0 +1,7 @@
+#Để tránh đưa các thư mục nặng như bin, obj vào trong image Docker
+bin/
+obj/
+.vs/
+.git/
+Dockerfile
+docker-compose.yml
