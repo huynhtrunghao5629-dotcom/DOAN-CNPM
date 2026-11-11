@@ -83,7 +83,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -123,7 +122,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 // Kích hoạt Middleware (Đúng thứ tự)
 app.UseCors("AllowAll");
