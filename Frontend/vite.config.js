@@ -8,11 +8,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-  allowedHosts: ['.trycloudflare.com'],
+    allowedHosts: ['.trycloudflare.com'],
     proxy: {
-      '/uploads': { target: 'https://localhost:7151', changeOrigin: true, secure: false },
+      '/uploads': { target: 'http://localhost:5278', changeOrigin: true, secure: false },
       '/api': {
-        target: 'https://localhost:7151', 
+        target: 'http://localhost:5278', 
         changeOrigin: true,
         secure: false 
       }
@@ -23,8 +23,8 @@ export default defineConfig({
     port: 4173,
     allowedHosts: ['.trycloudflare.com'],
     proxy: {
-      '/uploads': { target: 'https://localhost:7151', changeOrigin: true, secure: false },
-      '/api': { target: 'https://localhost:7151', changeOrigin: true, secure: false },
+      '/uploads': { target: 'http://localhost:5278', changeOrigin: true, secure: false },
+      '/api': { target: 'http://localhost:5278', changeOrigin: true, secure: false },
     },
   },
   plugins: [

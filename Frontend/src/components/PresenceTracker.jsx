@@ -48,6 +48,7 @@ export default function PresenceTracker() {
         if (controller === request) controller = null;
       }
     }
+    
 
     sendHeartbeat();
     const timer = window.setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
@@ -61,6 +62,8 @@ export default function PresenceTracker() {
       controller?.abort();
     };
   }, [isVisitorPage]);
+
+  
 
   return null;
 }
