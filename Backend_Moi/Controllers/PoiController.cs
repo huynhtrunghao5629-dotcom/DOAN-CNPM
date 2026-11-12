@@ -24,52 +24,61 @@ namespace HueSmartTourism.Backend.Controllers
         // Keep API response compatible with React: each POI has narrations.{vi,en,zh,ja,ko}.
         // Query texts separately: avoids JOIN collation mismatch of existing MySQL schema.
         private async Task<object[]> WithNarrationsAsync(IEnumerable<Poi> items)
+{
+    var list = items.ToList();
+    if (list.Count == 0) return Array.Empty<object>();
+    var ids = list.Select(p => p.Id).ToArray();
+    
+    // Đổi sang PoiTranslations và ánh xạ Text từ cột Description của bảng
+    var texts = await _context.PoiTranslations.AsNoTracking()
+        .Where(n => ids.Contains(n.PoiId)).ToListAsync();
+        
+    var lookup = texts.GroupBy(n => n.PoiId).ToDictionary(g => g.Key, g =>
+        g.ToDictionary(n => n.LanguageCode, n => new { text = n.Description, audioUrl = n.AudioUrl },
+            StringComparer.OrdinalIgnoreCase));
+
+    return list.Select(p => (object)new
+    {
+        p.Id, p.Name, p.Category, p.Description, p.Address,
+        p.Latitude, p.Longitude, p.Images, p.IsActive, p.CreatedAt,
+        p.Radius, p.Narration, p.AverageRating, p.TotalReviews,
+        narrations = lookup.TryGetValue(p.Id, out var values) ? values :
+            new Dictionary<string, object>() as object
+    }).ToArray();
+}
+
+private async Task SaveNarrationsAsync(string poiId,
+    Dictionary<string, PoiNarrationDto> narrations)
+{
+    foreach (var (rawLang, content) in narrations)
+    {
+        var lang = rawLang.Trim().ToLowerInvariant();
+        if (!SupportedLanguages.Contains(lang) || content == null) continue;
+        
+        // Vì bảng poi_translations dùng translation_id làm khóa chính, ta dùng FirstOrDefault để tìm theo PoiId và LanguageCode
+        // Sửa đoạn này:
+        var current = await _context.PoiTranslations
+        .FirstOrDefaultAsync(t => t.PoiId == poiId && t.LanguageCode == lang);
+            
+        if (current == null)
         {
-            var list = items.ToList();
-            if (list.Count == 0) return Array.Empty<object>();
-            var ids = list.Select(p => p.Id).ToArray();
-            var texts = await _context.PoiNarrations.AsNoTracking()
-                .Where(n => ids.Contains(n.PoiId)).ToListAsync();
-            var lookup = texts.GroupBy(n => n.PoiId).ToDictionary(g => g.Key, g =>
-                g.ToDictionary(n => n.LanguageCode, n => new { text = n.Text, audioUrl = n.AudioUrl },
-                    StringComparer.OrdinalIgnoreCase));
-
-            return list.Select(p => (object)new
+            _context.PoiTranslations.Add(new PoiTranslation
             {
-                p.Id, p.Name, p.Category, p.Description, p.Address,
-                p.Latitude, p.Longitude, p.Images, p.IsActive, p.CreatedAt,
-                p.Radius, p.Narration, p.AverageRating, p.TotalReviews,
-                narrations = lookup.TryGetValue(p.Id, out var values) ? values :
-                    new Dictionary<string, object>() as object
-            }).ToArray();
+                TranslationId = Guid.NewGuid().ToString(),
+                PoiId = poiId, 
+                LanguageCode = lang,
+                Description = content.Text ?? string.Empty,
+                AudioUrl = content.AudioUrl
+            });
         }
-
-        private async Task SaveNarrationsAsync(string poiId,
-            Dictionary<string, PoiNarrationDto> narrations)
+        else
         {
-            foreach (var (rawLang, content) in narrations)
-            {
-                var lang = rawLang.Trim().ToLowerInvariant();
-                if (!SupportedLanguages.Contains(lang) || content == null) continue;
-                var current = await _context.PoiNarrations.FindAsync(poiId, lang);
-                if (current == null)
-                {
-                    _context.PoiNarrations.Add(new PoiNarration
-                    {
-                        PoiId = poiId, LanguageCode = lang,
-                        Text = content.Text ?? string.Empty,
-                        AudioUrl = content.AudioUrl
-                    });
-                }
-                else
-                {
-                    if (content.Text != null) current.Text = content.Text;
-                    if (content.AudioUrl != null) current.AudioUrl = content.AudioUrl;
-                }
-            }
-            await _context.SaveChangesAsync();
+            if (content.Text != null) current.Description = content.Text;
+            if (content.AudioUrl != null) current.AudioUrl = content.AudioUrl;
         }
-
+    }
+    await _context.SaveChangesAsync();
+}
         // 1. Lấy danh sách điểm tham quan (Hỗ trợ Search từ khóa, Lọc category, và Phân trang)
         [HttpGet]
         public async Task<IActionResult> GetAllPois(
@@ -196,8 +205,8 @@ namespace HueSmartTourism.Backend.Controllers
             }
 
             // Clean up multilingual texts before deleting the POI.
-            var texts = await _context.PoiNarrations.Where(n => n.PoiId == id).ToListAsync();
-            _context.PoiNarrations.RemoveRange(texts);
+            var texts = await _context.PoiTranslations.Where(n => n.PoiId == id).ToListAsync();
+            _context.PoiTranslations.RemoveRange(texts);
             _context.Pois.Remove(poi);
             await _context.SaveChangesAsync();
 
