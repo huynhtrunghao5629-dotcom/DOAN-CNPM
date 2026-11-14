@@ -4,3 +4,4 @@ bin/
 
 # Large map files
 *.osm.pbf
+node_modules
