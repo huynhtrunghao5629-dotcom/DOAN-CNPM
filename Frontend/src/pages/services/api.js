@@ -17,11 +17,17 @@ export async function apiRequest(path, { auth = false, body, headers = {}, ...op
   if (auth) requestHeaders.Authorization = `Bearer ${token}`;
   let response;
   try {
-    response = await fetch(`${API_ROOT}${path}`, {
-      ...options,
-      headers: requestHeaders,
-      ...(body === undefined ? {} : { body: body instanceof FormData ? body : JSON.stringify(body) }),
-    });
+  const method = (options.method || 'GET').toUpperCase();
+  const isGetOrHead = method === 'GET' || method === 'HEAD';
+
+  response = await fetch(`${API_ROOT}${path}`, {
+    ...options,
+    headers: requestHeaders,
+    // Chỉ thêm body nếu KHÔNG phải GET/HEAD và body tồn tại
+    ...(isGetOrHead || body === undefined ? {} : { 
+      body: body instanceof FormData ? body : JSON.stringify(body) 
+    })
+  });
   } catch {
     throw new Error('Không kết nối được backend. Kiểm tra API, chứng chỉ HTTPS và Vite proxy.');
   }
