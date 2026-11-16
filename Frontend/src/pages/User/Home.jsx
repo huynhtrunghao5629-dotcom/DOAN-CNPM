@@ -1,115 +1,86 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { usePoiStore } from '../../stores/poiStore';
-import './Home.css';
 import { FALLBACK_IMAGE, getCuratedPhoto, getPoiImage } from '../../utils/poiImages';
+import './Home.css';
 
-const CATEGORIES = [
-  { id: 'all', label: 'Tất cả di tích', icon: '🏛️' },
-];
-
-const VISUALS = {
-'Di tích lịch sử': {
-  icon: '🏛️',
-  color: 'heritage',
-},
-};
-
-function normalizeText(value) {
-  return String(value || '')
+const normalize = (value = '') =>
+  String(value)
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
     .toLowerCase()
     .trim();
-}
-
-function getCategory(poi) {
-  return poi.category || 'Di tích lịch sử';
-}
 
 function readFavorites() {
   try {
-    const value = JSON.parse(
-      localStorage.getItem('hue_favorites') || '[]'
-    );
-
-    return Array.isArray(value) ? value : [];
+    const saved = JSON.parse(localStorage.getItem('hue_favorites') || '[]');
+    return Array.isArray(saved) ? saved : [];
   } catch {
     return [];
   }
 }
 
-function PoiCard({ poi, index, isFavorite, onFavorite }) {
-  const category = getCategory(poi);
-  const visual = VISUALS[category] || { icon: '🏛️', color: 'heritage' };
-  const [imageFailed, setImageFailed] = useState(false);
-  const imageUrl = getPoiImage(poi);
-  const curated = getCuratedPhoto(poi.name);
-  const fallbackForImage = imageUrl !== curated && curated !== FALLBACK_IMAGE ? curated : FALLBACK_IMAGE;
-  const [fallbackFailed, setFallbackFailed] = useState(false);
+function HeritageCard({ poi, index, saved, onFavorite }) {
+  const [failed, setFailed] = useState(0);
+  const primaryImage = getPoiImage(poi);
+  const curatedImage = getCuratedPhoto(poi.name);
+  const fallbackImage =
+    curatedImage && curatedImage !== primaryImage
+      ? curatedImage
+      : FALLBACK_IMAGE;
 
-  useEffect(() => { setImageFailed(false); setFallbackFailed(false); }, [imageUrl]);
+  useEffect(() => setFailed(0), [primaryImage, poi.id]);
+
+  const src =
+    failed === 0
+      ? primaryImage
+      : failed === 1
+        ? fallbackImage
+        : FALLBACK_IMAGE;
 
   return (
-    <article className="hue-poi-card">
-      <div className={`hue-poi-visual ${visual.color}`}>
+    <article className="regal-card">
+      <div className="regal-card__photo">
         <img
-          className="hue-poi-photo"
-          src={imageFailed ? (fallbackFailed ? FALLBACK_IMAGE : fallbackForImage) : imageUrl}
-          alt={`Ảnh minh họa địa điểm ${poi.name}`}
+          src={src}
+          alt={poi.name}
           loading={index < 3 ? 'eager' : 'lazy'}
-          decoding="async"
-          onError={() => { if (imageFailed) setFallbackFailed(true); else setImageFailed(true); }}
+          onError={() => setFailed(v => Math.min(v + 1, 2))}
         />
-        <div className="hue-poi-photo-shade" aria-hidden="true" />
 
-        <span className="hue-poi-card-index">
-          HUẾ • {String(index + 1).padStart(2, '0')}
-        </span>
-
-        <span className="hue-poi-category">
-          {category}
+        <span className="regal-card__number">
+          DI SẢN {String(index + 1).padStart(2, '0')}
         </span>
 
         <button
-          className={`hue-favorite ${
-            isFavorite ? 'active' : ''
-          }`}
+          type="button"
+          className={`regal-card__heart ${saved ? 'is-saved' : ''}`}
           onClick={() => onFavorite(poi.id)}
-          aria-label={
-            isFavorite
-              ? `Bỏ yêu thích ${poi.name}`
-              : `Yêu thích ${poi.name}`
-          }
-          title="Lưu yêu thích"
+          aria-pressed={saved}
+          aria-label={saved ? `Bỏ yêu thích ${poi.name}` : `Lưu ${poi.name}`}
         >
-          {isFavorite ? '♥' : '♡'}
+          {saved ? '♥' : '♡'}
         </button>
       </div>
 
-      <div className="hue-poi-card-content">
-        <div className="hue-poi-location">
-          <span>📍</span> Thành phố Huế
+      <div className="regal-card__body">
+        <div className="regal-card__category">
+          <span className="regal-ornament">✦</span>
+          {poi.category || 'Di tích lịch sử'}
         </div>
 
         <h3>{poi.name}</h3>
 
-        <p className="hue-poi-description">
-          {poi.description || 'Khám phá điểm đến tại Cố đô Huế.'}
+        <p>
+          {poi.description ||
+            'Khám phá một nét đẹp độc đáo trong không gian di sản Cố đô Huế.'}
         </p>
 
-        <div className="hue-poi-card-footer">
-          <span className="hue-poi-radius">
-            ◎ {poi.radius ?? 50}m
-          </span>
-
-          <Link
-            to={`/poi/${encodeURIComponent(poi.id)}`}
-            className="hue-poi-detail"
-          >
+        <div className="regal-card__footer">
+          <span>⌖ {poi.address || 'Thành phố Huế'}</span>
+          <Link to={`/poi/${encodeURIComponent(poi.id)}`}>
             Khám phá <span aria-hidden="true">↗</span>
           </Link>
         </div>
@@ -119,377 +90,350 @@ function PoiCard({ poi, index, isFavorite, onFavorite }) {
 }
 
 export default function Home() {
-  const navigate = useNavigate();
   const location = useLocation();
-  useEffect(() => {
-    if (location.pathname === '/destinations') {
-      const t = setTimeout(() => document.getElementById('hue-destinations')?.scrollIntoView(), 80);
-      return () => clearTimeout(t);
-    }
-  }, [location.pathname]);
 
-  const pois = usePoiStore((state) => state.pois);
-  const fetchPois = usePoiStore((state) => state.fetchPois);
-  const loading = usePoiStore((state) => state.loading);
-  const error = usePoiStore((state) => state.error);
-  const source = usePoiStore((state) => state.source);
+  const pois = usePoiStore(s => s.pois);
+  const fetchPois = usePoiStore(s => s.fetchPois);
+  const loading = usePoiStore(s => s.loading);
+  const error = usePoiStore(s => s.error);
+  const source = usePoiStore(s => s.source);
 
-  const [search, setSearch] = useState('');
+  const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
-  const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [favorites, setFavorites] = useState(readFavorites);
-  const [visibleCount, setVisibleCount] = useState(6);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [limit, setLimit] = useState(6);
 
   useEffect(() => {
-    // Lấy dữ liệu mới từ MongoDB khi mở trang chủ (Offline vẫn đọc IndexedDB).
     fetchPois({ force: true }).catch(console.warn);
   }, [fetchPois]);
 
-  const toggleFavorite = (id) => {
-    setFavorites((current) => {
-      const updated = current.includes(id)
-        ? current.filter((item) => item !== id)
+  useEffect(() => {
+    if (location.pathname !== '/destinations') return;
+    const timer = setTimeout(() => {
+      document.getElementById('regal-destinations')
+        ?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  const categories = useMemo(
+    () => ['all', ...new Set(pois.map(p => p.category).filter(Boolean))],
+    [pois]
+  );
+
+  const filtered = useMemo(() => {
+    const term = normalize(query);
+    return pois.filter(p => {
+      const matchesText =
+        !term ||
+        normalize(`${p.name} ${p.description || ''} ${p.address || ''}`)
+          .includes(term);
+
+      const matchesCategory =
+        category === 'all' || p.category === category;
+
+      const matchesSaved =
+        !favoritesOnly || favorites.some(id => String(id) === String(p.id));
+
+      return matchesText && matchesCategory && matchesSaved;
+    });
+  }, [pois, query, category, favoritesOnly, favorites]);
+
+  const heritageCount = pois.filter(p =>
+    normalize(p.category).includes('di tich')
+  ).length;
+const heroPoi =
+  pois.find(p => normalize(p.name).includes('dai noi')) ||
+  pois.find(p => normalize(p.name).includes('chua thien mu')) ||
+  pois[0];
+  const toggleFavorite = id => {
+    setFavorites(current => {
+      const exists = current.some(x => String(x) === String(id));
+      const next = exists
+        ? current.filter(x => String(x) !== String(id))
         : [...current, id];
 
-      localStorage.setItem(
-        'hue_favorites',
-        JSON.stringify(updated)
-      );
-
-      return updated;
+      localStorage.setItem('hue_favorites', JSON.stringify(next));
+      return next;
     });
   };
 
-  const filteredPois = useMemo(() => {
-    const keyword = normalizeText(search);
-
-    return pois.filter((poi) => {
-      const matchSearch =
-        !keyword ||
-        normalizeText(
-          `${poi.name} ${poi.description || ''}`
-        ).includes(keyword);
-
-      const matchCategory =
-        category === 'all' ||
-        getCategory(poi) === category;
-
-      const matchFavorite =
-        !favoritesOnly || favorites.includes(poi.id);
-
-      return matchSearch && matchCategory && matchFavorite;
-    });
-  }, [pois, search, category, favoritesOnly, favorites]);
-
-  const displayedPois = filteredPois.slice(0, visibleCount);
-  const heritageCount = pois.filter(p => /di tích|di tich/i.test(p.category || '')).length;
-
-  const selectCategory = (id) => {
-    setCategory(id);
-    setVisibleCount(6);
-  };
-
-  const explore = () => {
-    document
-      .getElementById('hue-destinations')
+  const scrollToPlaces = () =>
+    document.getElementById('regal-destinations')
       ?.scrollIntoView({ behavior: 'smooth' });
+
+  const clearFilters = () => {
+    setQuery('');
+    setCategory('all');
+    setFavoritesOnly(false);
+    setLimit(6);
   };
 
   return (
-    <div className="hue-home">
-      {/* HEADER */}
-      <header className="hue-navbar">
-        <Link to="/home" className="hue-brand">
-          <div className="hue-brand-icon">H</div>
-          <div>
-            <strong>HUẾ<span>GO</span></strong>
-            <small>DISCOVER THE HERITAGE</small>
-          </div>
+    <main className="regal-home">
+      <header className="regal-navbar">
+        <Link to="/home" className="regal-brand">
+          <span className="regal-brand__emblem">H</span>
+          <span>
+            <strong>HUẾ <i>GO</i></strong>
+            <small>KHÁM PHÁ DI SẢN CỐ ĐÔ</small>
+          </span>
         </Link>
 
-        <nav className="hue-nav-links">
-          <Link to="/home" className="selected">
-            Khám phá
-          </Link>
+        <nav className="regal-navbar__links" aria-label="Điều hướng chính">
+          <Link to="/home" className="is-current">Khám phá</Link>
           <Link to="/map">Bản đồ</Link>
-          <a href="#hue-destinations">Điểm đến</a>
+          <Link to="/destinations">Điểm đến</Link>
         </nav>
 
-        <button
-          className="hue-nav-map"
-          onClick={() => navigate('/map')}
-        >
-          ◉ Bản đồ du lịch <span>↗</span>
-        </button>
+        <Link to="/map" className="regal-navbar__cta">
+          ⌖ &nbsp; Bản đồ du lịch <span>↗</span>
+        </Link>
       </header>
 
-      {/* HERO */}
-      <section className="hue-hero">
-        <div className="hue-hero-overlay" />
-
-        <div className="hue-hero-content">
-          <div className="hue-eyebrow">
-            <span className="hue-eyebrow-dot" />
-            CHÀO MỪNG ĐẾN VỚI CỐ ĐÔ
-          </div>
-
-          <h1>
-            Huế không chỉ là
-            <br />
-            điểm đến.
-            <br />
-            <em>Là một cảm xúc.</em>
-          </h1>
-
-          <p>
-            Khám phá những di sản trăm năm, góc phố bình yên
-            và nét văn hóa rất riêng của miền đất cố đô.
-          </p>
-
-          <div className="hue-hero-actions">
-            <button
-              className="hue-hero-primary"
-              onClick={explore}
-            >
-              Khám phá ngay <span>↗</span>
-            </button>
-
-            <button
-              className="hue-hero-secondary"
-              onClick={() => navigate('/map')}
-            >
-              ◎ Xem bản đồ
-            </button>
-          </div>
-        </div>
-
-        <div className="hue-hero-bottom">
-          <span>16°28′ BẮC · 107°35′ ĐÔNG</span>
-          <span>VIETNAM — HUE CITY</span>
-        </div>
-      </section>
-
-      {/* STATS */}
-      <section className="hue-stats">
-        <div>
-          <strong>{pois.length.toString().padStart(2, '0')}</strong>
-          <span>Điểm đến khám phá</span>
-        </div>
-
-<div>
-  <strong>{heritageCount.toString().padStart(2, '0')}</strong>
-  <span>Di tích lịch sử tiêu biểu</span>
-</div>
-
-        <div>
-          <strong>01</strong>
-          <span>Vùng đất di sản</span>
-        </div>
-      </section>
-
-      {/* DESTINATIONS */}
-      <section
-        className="hue-destinations"
-        id="hue-destinations"
-      >
-        <div className="hue-section-heading">
-          <div>
-            <span className="hue-section-kicker">
-              ✦ KHÁM PHÁ THEO CÁCH CỦA BẠN
+      <section className="regal-hero">
+        <div className="regal-hero__inner">
+          <div className="regal-hero__copy">
+            <span className="regal-eyebrow">
+              <span>✦</span> CỐ ĐÔ HUẾ <span>✦</span>
             </span>
 
+            <h1>
+              Huế – Điểm hẹn
+              <br />
+              <span>di sản ngàn đời</span>
+            </h1>
+
+            <p className="regal-hero__quote">
+              Giữa lòng di sản, chạm vào tinh hoa Cố đô.
+            </p>
+
+            <p className="regal-hero__description">
+              Từ mái ngói hoàng cung trầm mặc, dòng Hương êm đềm
+              đến những câu chuyện của triều Nguyễn. Mỗi điểm đến
+              mở ra một hành trình khám phá vẻ đẹp xứ Huế.
+            </p>
+
+            <div className="regal-hero__actions">
+              <button type="button" onClick={scrollToPlaces}
+                className="regal-button regal-button--gold">
+                Khám phá ngay <span>↗</span>
+              </button>
+
+              <Link to="/map" className="regal-button regal-button--outline">
+                ⌖ Xem bản đồ
+              </Link>
+            </div>
+
+            <div className="regal-hero__signature">
+              <span className="regal-signature-line" />
+              DI SẢN • VĂN HÓA • TRẢI NGHIỆM
+            </div>
+          </div>
+
+          <div className="regal-hero__visual" aria-label="Hình ảnh Cố đô Huế">
+<div className="regal-hero__arch">
+  {heroPoi && (
+    <img
+      className="regal-hero__photo"
+      src={getPoiImage(heroPoi)}
+      alt={`Di sản Huế - ${heroPoi.name}`}
+      onError={(e) => {
+        const img = e.currentTarget;
+        img.onerror = null;
+        img.src = getCuratedPhoto(heroPoi.name) || FALLBACK_IMAGE;
+      }}
+    />
+  )}
+
+  <span className="regal-hero__image-label">
+    HUẾ, VIỆT NAM
+  </span>
+</div>
+            
+            <span className="regal-hero__visual-orbit" aria-hidden="true" />
+          </div>
+        </div>
+      </section>
+
+      <section className="regal-stats" aria-label="Thông tin HUẾ GO">
+        <div className="regal-stats__item">
+          <span className="regal-stats__icon">◇</span>
+          <div>
+            <strong>{String(pois.length).padStart(2, '0')}</strong>
+            <p>Điểm đến khám phá</p>
+          </div>
+        </div>
+
+        <div className="regal-stats__item">
+          <span className="regal-stats__icon">♜</span>
+          <div>
+            <strong>{String(heritageCount).padStart(2, '0')}</strong>
+            <p>Di tích lịch sử</p>
+          </div>
+        </div>
+
+        <div className="regal-stats__item">
+          <span className="regal-stats__icon">◎</span>
+          <div>
+            <strong>05</strong>
+            <p>Ngôn ngữ thuyết minh</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="regal-destinations" className="regal-destinations">
+        <div className="regal-section-heading">
+          <div>
+            <span className="regal-eyebrow regal-eyebrow--dark">
+              ✦ KHÁM PHÁ TINH HOA CỐ ĐÔ
+            </span>
             <h2>
               Những điểm đến
               <br />
-              <em>không thể bỏ lỡ.</em>
+              <em>tiêu biểu tại Huế.</em>
             </h2>
           </div>
-
           <p>
-            Từ những di tích cổ kính đến những góc bình yên,
-            Huế luôn có điều thú vị đang chờ bạn.
+            Mỗi mái ngói, cổng thành và khu lăng tẩm đều kể một
+            câu chuyện riêng. Chọn điểm đến và bắt đầu hành trình
+            khám phá cùng HUẾ GO.
           </p>
         </div>
 
-        {/* SEARCH */}
-        <div className="hue-search-panel">
-          <div className="hue-search-box">
-            <span className="hue-search-icon">⌕</span>
-
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setVisibleCount(6);
-              }}
-              placeholder="Bạn muốn khám phá nơi nào ở Huế?"
-              aria-label="Tìm kiếm địa điểm du lịch"
-            />
-
-            {search && (
-              <button
-                className="hue-clear-search"
-                onClick={() => setSearch('')}
-                aria-label="Xóa từ khóa"
-              >
-                ×
-              </button>
-            )}
-          </div>
-
-          <button
-            className="hue-search-button"
-            onClick={explore}
-          >
-            Tìm điểm đến ↗
+        <div className="regal-search">
+          <span className="regal-search__icon">⌕</span>
+          <input
+            type="search"
+            value={query}
+            onChange={e => {
+              setQuery(e.target.value);
+              setLimit(6);
+            }}
+            placeholder="Bạn muốn khám phá nơi nào ở Huế?"
+            aria-label="Tìm kiếm địa điểm ở Huế"
+          />
+          {query && (
+            <button type="button" className="regal-search__clear"
+              onClick={() => setQuery('')}
+              aria-label="Xóa nội dung tìm kiếm">×</button>
+          )}
+          <button type="button" onClick={scrollToPlaces}
+            className="regal-search__submit">
+            Tìm điểm đến <span>↗</span>
           </button>
         </div>
 
-        {/* FILTERS */}
-        <div className="hue-filters">
-          <div className="hue-category-list">
-            {CATEGORIES.map((item) => (
-              <button
-                key={item.id}
-                className={`hue-filter ${
-                  category === item.id ? 'active' : ''
-                }`}
-                onClick={() => selectCategory(item.id)}
-              >
-                <span>{item.icon}</span> {item.label}
+        <div className="regal-filters">
+          <div className="regal-filters__categories">
+            {categories.map(item => (
+              <button key={item} type="button"
+                className={`regal-filter ${category === item ? 'is-active' : ''}`}
+                aria-pressed={category === item}
+                onClick={() => {setCategory(item); setLimit(6);}}>
+                {item === 'all' ? '✦ Tất cả di tích' : item}
               </button>
             ))}
           </div>
-
-          <button
-            className={`hue-favorites-toggle ${
-              favoritesOnly ? 'active' : ''
-            }`}
-            onClick={() => {
-              setFavoritesOnly(!favoritesOnly);
-              setVisibleCount(6);
-            }}
-          >
-            ♥ Yêu thích ({favorites.length})
+          <button type="button"
+            className={`regal-filter regal-filter--favorite ${favoritesOnly ? 'is-active' : ''}`}
+            aria-pressed={favoritesOnly}
+            onClick={() => {setFavoritesOnly(v => !v); setLimit(6);}}>
+            ♡ Yêu thích ({favorites.length})
           </button>
         </div>
 
-        <div className="hue-results-line">
+        <div className="regal-results">
           <span>
-            <strong>{filteredPois.length}</strong> địa điểm
-            được tìm thấy
+            <strong>{filtered.length}</strong> điểm đến được tìm thấy
           </span>
-          <span>KHÁM PHÁ HUẾ • 2026</span>
+          <span>DI SẢN CỐ ĐÔ HUẾ</span>
         </div>
 
         {loading && pois.length === 0 && (
-          <div className="hue-poi-grid" role="status" aria-label="Đang tải danh sách di tích">
-            {Array.from({ length: 6 }, (_, i) => (
-              <div className="hue-poi-skeleton" key={i} aria-hidden="true">
-                <div className="hue-skeleton-photo hue-shimmer" />
-                <div className="hue-skeleton-content">
-                  <div className="hue-skeleton-line hue-shimmer" style={{ width: '35%' }} />
-                  <div className="hue-skeleton-line hue-shimmer" style={{ width: '75%', height: 23 }} />
-                  <div className="hue-skeleton-line hue-shimmer" />
-                  <div className="hue-skeleton-line hue-shimmer" style={{ width: '85%' }} />
-                </div>
-              </div>
+          <div className="regal-grid" role="status" aria-label="Đang tải địa điểm">
+            {Array.from({length: 6}, (_, i) => (
+              <div key={i} className="regal-skeleton" />
             ))}
           </div>
         )}
-        {error && <p role="alert" style={{ color: '#9b4d19', marginBottom: 18 }}>
-          {source === 'offline' ? 'Đang sử dụng dữ liệu ngoại tuyến: ' : 'Không tải được dữ liệu: '}{error}
-        </p>}
-        {/* CARDS */}
-        {(!loading || pois.length > 0) && (filteredPois.length > 0 ? (
-          <>
-            <div className="hue-poi-grid">
-              {displayedPois.map((poi, index) => (
-                <PoiCard
-                  key={poi.id}
-                  poi={poi}
-                  index={index}
-                  isFavorite={favorites.includes(poi.id)}
-                  onFavorite={toggleFavorite}
-                />
-              ))}
-            </div>
 
-            {visibleCount < filteredPois.length && (
-              <div className="hue-more-wrap">
-                <button
-                  className="hue-more-button"
-                  onClick={() =>
-                    setVisibleCount((count) => count + 6)
-                  }
-                >
-                  Xem thêm địa điểm ↓
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="hue-empty">
-            <span>🔎</span>
-            <h3>Chưa tìm thấy địa điểm phù hợp</h3>
-            <p>
-              Hãy thử một từ khóa hoặc nhóm địa điểm khác.
-            </p>
-            <button
-              onClick={() => {
-                setSearch('');
-                setCategory('all');
-                setFavoritesOnly(false);
-              }}
-            >
-              Xem tất cả địa điểm
-            </button>
-          </div>
-        ))}
-      </section>
-
-      {/* CTA */}
-      <section className="hue-map-cta">
-        <div className="hue-map-cta-decoration">⌖</div>
-
-        <div>
-          <span>DU LỊCH THÔNG MINH</span>
-          <h2>
-            Cả thành phố Huế,
-            <br />
-            trong tầm tay bạn.
-          </h2>
-          <p>
-            Khám phá vị trí điểm tham quan và các vùng
-            địa lý trên bản đồ tương tác.
+        {error && (
+          <p className="regal-alert" role="status">
+            {source === 'offline'
+              ? 'Đang hiển thị dữ liệu ngoại tuyến. '
+              : 'Chưa thể cập nhật dữ liệu. '}
+            {error}
           </p>
-          <button onClick={() => navigate('/map')}>
-            Mở bản đồ tương tác ↗
-          </button>
-        </div>
+        )}
 
-        <div className="hue-cta-compass" aria-hidden="true">
-          <div>✳</div>
-          <span>DISCOVER HUE</span>
+        {(!loading || pois.length > 0) && (
+          filtered.length ? (
+            <>
+              <div className="regal-grid">
+                {filtered.slice(0, limit).map((poi, index) => (
+                  <HeritageCard
+                    key={poi.id}
+                    poi={poi}
+                    index={index}
+                    saved={favorites.some(id => String(id) === String(poi.id))}
+                    onFavorite={toggleFavorite}
+                  />
+                ))}
+              </div>
+
+              {limit < filtered.length && (
+                <div className="regal-more">
+                  <button type="button" onClick={() => setLimit(v => v + 6)}>
+                    Xem thêm điểm đến ↓
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="regal-empty">
+              <h3>Chưa tìm thấy điểm đến phù hợp</h3>
+              <p>Hãy thử một từ khóa hoặc bộ lọc khác.</p>
+              <button type="button" onClick={clearFilters}>
+                Xem tất cả điểm đến
+              </button>
+            </div>
+          )
+        )}
+      </section>
+
+      <section className="regal-journey">
+        <div className="regal-journey__copy">
+          <span>✦ HÀNH TRÌNH DI SẢN</span>
+          <h2>Cả Cố đô Huế,<br /><em>trong tầm tay bạn.</em></h2>
+          <p>
+            Khám phá địa điểm trên bản đồ tương tác,
+            sử dụng GPS và lắng nghe thuyết minh đa ngôn ngữ.
+          </p>
+          <Link to="/map" className="regal-button regal-button--gold">
+            Mở bản đồ tương tác ↗
+          </Link>
+        </div>
+        <div className="regal-journey__seal" aria-hidden="true">
+          <span>✦</span>
+          <small>HUẾ GO</small>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="hue-footer">
+      <footer className="regal-footer">
         <div>
-          <strong>HUẾ<span>GO</span></strong>
+          <strong>HUẾ <span>GO</span></strong>
           <p>Khám phá di sản. Lưu giữ trải nghiệm.</p>
         </div>
-
-        <div className="hue-footer-links">
+        <nav aria-label="Điều hướng cuối trang">
           <Link to="/home">Trang chủ</Link>
           <Link to="/map">Bản đồ</Link>
+          <Link to="/destinations">Điểm đến</Link>
           <Link to="/admin/login">Quản trị</Link>
-        </div>
-
-        <p>© 2026 HUẾ GO · Dự án du lịch thông minh</p>
+        </nav>
+        <small>© 2026 HUẾ GO · Du lịch thông minh Huế</small>
       </footer>
-    </div>
+    </main>
   );
 }

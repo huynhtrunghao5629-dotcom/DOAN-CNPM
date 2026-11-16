@@ -12,7 +12,9 @@ import { createGeofenceWatcher, nearbyPois } from '../../services/GeofenceEngine
 import GpsSimulator from '../../components/GpsSimulator';
 import AudioPlayerBar from '../../components/AudioPlayerBar';
 import { getPoiImage, getCuratedPhoto, FALLBACK_IMAGE } from '../../utils/poiImages';
-
+import ImperialMapHeader, {
+  ImperialMapSearch
+} from '../../components/ImperialMapUI';
 
 maplibregl.setWorkerUrl(workerUrl);
 
@@ -41,13 +43,13 @@ const OFFLINE_STYLE = {
     hueOffline: { type: 'geojson', data: '/offline/hue-basemap.geojson' },
   },
   layers: [
-    { id: 'offline-background', type: 'background', paint: { 'background-color': '#edf5ee' } },
-    { id: 'offline-parks', type: 'fill', source: 'hueOffline', filter: ['==', ['get','kind'], 'park'], paint: { 'fill-color': '#b7dbac', 'fill-opacity': 0.85 } },
-    { id: 'offline-water-areas', type: 'fill', source: 'hueOffline', filter: ['==', ['get','kind'], 'water-area'], paint: { 'fill-color': '#a6cee1' } },
-    { id: 'offline-water-lines', type: 'line', source: 'hueOffline', filter: ['==', ['get','kind'], 'water-line'], paint: { 'line-color': '#80b9dc', 'line-width': ['interpolate',['linear'],['zoom'],10,1,16,5] } },
-    { id: 'offline-roads-casing', type: 'line', source: 'hueOffline', filter: ['in',['get','kind'],['literal',['road','road-major']]], paint: { 'line-color': '#c1c5c2', 'line-width': ['interpolate',['linear'],['zoom'],10,1.5,16,9] } },
-    { id: 'offline-roads', type: 'line', source: 'hueOffline', filter: ['==',['get','kind'],'road'], paint: { 'line-color': '#fffdf6', 'line-width': ['interpolate',['linear'],['zoom'],10,1,16,6] } },
-    { id: 'offline-roads-major', type: 'line', source: 'hueOffline', filter: ['==',['get','kind'],'road-major'], paint: { 'line-color': '#f5dfaa', 'line-width': ['interpolate',['linear'],['zoom'],10,1.7,16,8] } },
+    { id: 'offline-background', type: 'background', paint: { 'background-color': '#ecdcb9' } },
+    { id: 'offline-parks', type: 'fill', source: 'hueOffline', filter: ['==', ['get','kind'], 'park'], paint: { 'fill-color': '#cfc291', 'fill-opacity': 0.85 } },
+    { id: 'offline-water-areas', type: 'fill', source: 'hueOffline', filter: ['==', ['get','kind'], 'water-area'], paint: { 'fill-color': '#9ab0a6' } },
+    { id: 'offline-water-lines', type: 'line', source: 'hueOffline', filter: ['==', ['get','kind'], 'water-line'], paint: { 'line-color': '#7e998f', 'line-width': ['interpolate',['linear'],['zoom'],10,1,16,5] } },
+    { id: 'offline-roads-casing', type: 'line', source: 'hueOffline', filter: ['in',['get','kind'],['literal',['road','road-major']]], paint: { 'line-color': '#b0996e', 'line-width': ['interpolate',['linear'],['zoom'],10,1.5,16,9] } },
+    { id: 'offline-roads', type: 'line', source: 'hueOffline', filter: ['==',['get','kind'],'road'], paint: { 'line-color': '#f7edd4', 'line-width': ['interpolate',['linear'],['zoom'],10,1,16,6] } },
+    { id: 'offline-roads-major', type: 'line', source: 'hueOffline', filter: ['==',['get','kind'],'road-major'], paint: { 'line-color': '#dfba6b', 'line-width': ['interpolate',['linear'],['zoom'],10,1.7,16,8] } },
   ],
 };
 
@@ -60,6 +62,7 @@ export default function MapPage() {
   const centeredOnGpsRef = useRef(false);
   const pois = usePoiStore(s => s.pois), fetchPois = usePoiStore(s => s.fetchPois);
   const activePoi = usePoiStore(s => s.activePoi), setActivePoi = usePoiStore(s => s.setActivePoi);
+  const [mapQuery, setMapQuery] = useState('');
   const userPosition = usePoiStore(s => s.userPosition), setUserPosition = usePoiStore(s => s.setUserPosition);
   const loading = usePoiStore(s => s.loading), error = usePoiStore(s => s.error);
   const currentLanguage = usePoiStore(s => s.currentLanguage);
@@ -153,23 +156,36 @@ export default function MapPage() {
     } else {
       map.getSource('geofence').setData(collection);
     }
-    if (!map.getLayer('geofence-fill')) {
+if (!map.getLayer('geofence-fill')) {
       map.addLayer({ id: 'geofence-fill', type: 'fill', source: 'geofence',
-        paint: { 'fill-color': '#e53935', 'fill-opacity': 0.18 } });
+        paint: { 'fill-color': '#9e2a2b', 'fill-opacity': 0.22 } });
     }
     if (!map.getLayer('geofence-outline')) {
       map.addLayer({ id: 'geofence-outline', type: 'line', source: 'geofence',
-        paint: { 'line-color': '#b71c1c', 'line-width': 2.5 } });
+        paint: { 'line-color': '#d4af37', 'line-width': 2.5 } });
     }
 
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = valid.map(p => {
       const btn = document.createElement('button');
+      btn.classList.add('regal-map-pin');
       btn.type = 'button';
-      btn.textContent = '📍';
-      btn.title = p.name;
+btn.innerHTML = `
+  <svg viewBox="0 0 24 24"
+       width="23" height="23"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="1.8"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       aria-hidden="true">
+    <path d="M2 9 12 3l10 6H2Z"/>
+    <path d="M4 10v9M8 10v9M16 10v9M20 10v9"/>
+    <path d="M2 21h20M11 21v-7h2v7"/>
+  </svg>
+`;      btn.title = p.name;
       btn.setAttribute('aria-label', p.name);
-      btn.style.cssText = 'background:#fff;border:2px solid #b71c1c;border-radius:50%;width:38px;height:38px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 8px #0003';
+      btn.style.cssText = 'background:linear-gradient(135deg,#8b1e1e,#3b0d0d);border:2px solid #d4af37;color:#ffe27a;border-radius:50%;width:40px;height:40px;font-size:19px;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 12px rgba(20,10,5,.55),0 0 0 3px rgba(212,175,55,.28)';
       btn.onclick = () => setActivePoiRef.current(p);
       return new maplibregl.Marker({ element: btn, anchor: 'center' })
         .setLngLat([p.lng, p.lat]).addTo(map);
@@ -270,7 +286,26 @@ export default function MapPage() {
   const simulate=(p)=>{disableGps();setSimOn(true);setGpsError('');setEntered(null);watcherRef.current.reset();setUserPosition(p);mapRef.current?.flyTo({center:[p.lng,p.lat],zoom:16});if(window.matchMedia('(max-width:640px)').matches)setControlsExpanded(false);};
   return (
     <div className="hue-map-page">
+
+<header className="huego-imperial-map-header">
+  <Link to="/home" className="huego-imperial-map-brand">
+    HUẾ GO
+    <small>KHÁM PHÁ DI SẢN CỐ ĐÔ</small>
+  </Link>
+
+  <nav className="huego-imperial-map-nav" aria-label="Điều hướng bản đồ">
+    <Link to="/home">Khám phá</Link>
+    <span className="is-current" aria-current="page">Bản đồ</span>
+    <Link to="/destinations">Điểm đến</Link>
+  </nav>
+
+  <span className="huego-imperial-map-caption">
+    DI SẢN CỐ ĐÔ HUẾ
+  </span>
+</header>
+
       <div ref={nodeRef} className="hue-map-canvas" />
+      <ImperialMapHeader language={currentLanguage} />
       {offlineMode && (
         <div aria-label="Các di tích trên sơ đồ ngoại tuyến" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 5, overflow: 'hidden' }}>
           <svg aria-hidden="true" style={{ width: '100%', height: '100%', position: 'absolute', inset: 0, overflow: 'hidden' }}>
@@ -318,6 +353,75 @@ export default function MapPage() {
             </button>
           </div>
           <div className="hue-map-control-details">
+            <ImperialMapSearch
+  pois={pois}
+  onSelect={poi => {
+    setActivePoi(poi);
+    setShowAudio(false);
+
+    const lat = Number(poi.lat);
+    const lng = Number(poi.lng);
+
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      mapRef.current?.flyTo({
+        center: [lng, lat],
+        zoom: 16,
+        duration: 850,
+        essential: true
+      });
+    }
+
+    if (window.innerWidth <= 767) {
+      setControlsExpanded(false);
+    }
+  }}
+/>
+
+<div className="huego-map-search">
+  <input
+    type="search"
+    value={mapQuery}
+    onChange={(e) => setMapQuery(e.target.value)}
+    placeholder="Tìm di tích, địa điểm ở Huế..."
+  />
+
+  {mapQuery.trim() && (
+    <div className="huego-map-results">
+      {pois
+        .filter((p) =>
+          (p.name || '')
+            .toLocaleLowerCase('vi')
+            .includes(mapQuery.trim().toLocaleLowerCase('vi'))
+        )
+        .slice(0, 5)
+        .map((p) => (
+          <button
+            type="button"
+            key={p.id}
+            onClick={() => {
+              setActivePoi(p);
+
+              if (
+                Number.isFinite(Number(p.lat)) &&
+                Number.isFinite(Number(p.lng))
+              ) {
+                mapRef.current?.flyTo({
+                  center: [Number(p.lng), Number(p.lat)],
+                  zoom: 16,
+                  essential: true,
+                });
+              }
+
+              setMapQuery('');
+            }}
+          >
+            {p.name}
+          </button>
+        ))}
+    </div>
+  )}
+</div>
+
           <div className="hue-map-actions">
             <button type="button" className={`hue-btn hue-btn-primary ${gpsOn ? 'hue-btn-active' : ''}`} onClick={gpsOn ? disableGps : enableGps}>
               <span aria-hidden="true">📍</span> {gpsOn ? 'Tắt GPS thật' : 'Bật GPS thật'}

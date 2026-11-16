@@ -1,0 +1,885 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap');
+
+:root {
+  --imperial-green: #082f28;
+  --imperial-green-2: #154a3c;
+  --imperial-gold: #c59b52;
+  --imperial-gold-light: #f0cd84;
+  --imperial-paper: #f8f0e3;
+  --imperial-white: #fffaf1;
+  --imperial-ink: #18392f;
+  --imperial-muted: #6d776d;
+  --imperial-shadow: 0 20px 60px rgba(20, 43, 33, .16);
+}
+
+/* ============ TRANG CHỦ ============ */
+
+.hue-home {
+  --wood-dark: var(--imperial-green);
+  --wood-medium: var(--imperial-green-2);
+  --cinnabar: #a46b31;
+  --cinnabar-dark: #835022;
+  --gold: var(--imperial-gold);
+  --gold-light: var(--imperial-gold-light);
+  --parchment: var(--imperial-paper);
+  --parchment-card: var(--imperial-white);
+  --ink: var(--imperial-ink);
+  --ink-muted: var(--imperial-muted);
+  color: var(--imperial-ink);
+  background:
+    radial-gradient(ellipse at 5% 25%, #dcbf871c, transparent 35%),
+    radial-gradient(ellipse at 95% 70%, #b2c6ad24, transparent 40%),
+    repeating-linear-gradient(0deg, #69471b05 0 1px, transparent 1px 5px),
+    var(--imperial-paper);
+}
+
+.hue-navbar {
+  min-height: 78px;
+  padding: 12px max(5%, calc((100% - 1350px) / 2));
+  border-top: 0;
+  border-bottom: 1px solid #c59b527c;
+  background: linear-gradient(120deg, #06291f, #0b3d32 70%, #082f28);
+  box-shadow: 0 10px 32px #06251c38;
+}
+
+.hue-brand {
+  background: transparent;
+  border: 0;
+  color: #fff8e9;
+}
+
+.hue-brand-icon {
+  background: linear-gradient(135deg, #fff1cc, #d5ad63);
+  color: #153f32;
+  border: 1px solid #f4d99d;
+  border-radius: 8px;
+}
+
+.hue-brand strong { color: #fff9e9; }
+.hue-brand strong span { color: #f0c87e; }
+.hue-brand small { color: #d7c19b; }
+
+.hue-nav-links a { color: #f5eddd; }
+.hue-nav-links a:hover,
+.hue-nav-links a.selected { color: #f2c77c; }
+
+.hue-nav-links a.selected::after {
+  content: "";
+  width: 28px;
+  height: 2px;
+  bottom: -9px;
+  border-radius: 2px;
+  background: #f0c87e;
+}
+
+.hue-nav-map {
+  color: #f9e7bf;
+  background: #ffffff0c;
+  border: 1px solid #d8b574;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.hue-nav-map:hover { background: #d2a354; color: #102f27; }
+
+/* Hero di sản */
+.hue-hero {
+  min-height: clamp(570px, 69vh, 720px);
+  padding: 85px max(6%, calc((100% - 1280px) / 2));
+  color: #fff7ea;
+  border-bottom: 2px solid #d3a65d;
+  background-image:
+    linear-gradient(90deg,
+      rgba(4, 43, 35, .99) 0%,
+      rgba(5, 48, 39, .98) 31%,
+      rgba(5, 48, 39, .82) 47%,
+      rgba(5, 48, 39, .20) 72%,
+      rgba(5, 48, 39, .10) 100%),
+    url('../assets/hero.png');
+  background-position: center, center;
+  background-size: cover, cover;
+}
+
+.hue-hero::before {
+  inset: 16px;
+  border: 1px solid #d3a65d43;
+  outline: 1px solid #d3a65d24;
+  outline-offset: -8px;
+}
+
+.hue-hero::after {
+  content: "";
+  right: -110px;
+  top: -130px;
+  width: 365px;
+  height: 365px;
+  border: 2px solid #dcb56b65;
+  box-shadow: 0 0 0 12px #dcb56b14, 0 0 0 23px #dcb56b0d;
+  border-radius: 50%;
+  transform: none;
+}
+
+.hue-hero-content { max-width: 660px; }
+
+.hue-eyebrow {
+  background: transparent;
+  padding: 0;
+  border: 0;
+  color: #edc77b;
+  letter-spacing: 3px;
+}
+
+.hue-eyebrow-dot { background: #e6be70; }
+
+.hue-hero h1 {
+  font: 700 clamp(42px, 5.3vw, 77px)/1.12 'Playfair Display', Georgia, serif;
+  color: #fffaf0;
+  letter-spacing: -1.7px;
+  text-shadow: 0 4px 28px #031d1ab0;
+}
+
+.hue-hero h1 em {
+  display: block;
+  margin-top: 12px;
+  color: #f0c781;
+  font-size: .52em;
+  font-weight: 500;
+  line-height: 1.38;
+}
+
+.hue-hero-content > p {
+  color: #f2eadd;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.hue-hero-primary,
+.hue-hero-secondary {
+  min-height: 49px;
+  border-radius: 9px;
+  padding-inline: 26px;
+}
+
+.hue-hero-primary {
+  border: 1px solid #f2d79d;
+  background: linear-gradient(115deg, #f2d18b, #c99c50);
+  color: #122e27;
+}
+
+.hue-hero-secondary {
+  background: #082f286b;
+  border: 1px solid #e3c28b;
+  color: #fff9eb;
+}
+
+.hue-hero-secondary:hover {
+  background: #d4aa61;
+  color: #102d25;
+}
+
+.hue-hero-bottom { color: #f4dfbbbd; }
+
+/* Thống kê nổi trên hero */
+.hue-stats {
+  position: relative;
+  z-index: 2;
+  width: min(1260px, calc(100% - 48px));
+  margin: -30px auto 0;
+  padding: 21px 25px;
+  border: 1px solid #cda663;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 20% 50%, #e5c79330, transparent 45%),
+    linear-gradient(110deg, #fff9ee, #f4e6ce, #fff9ee);
+  box-shadow: 0 16px 35px #2d301b24;
+}
+
+.hue-stats > div {
+  border-right: 1px solid #c9a06b8c;
+  gap: 3px;
+}
+
+.hue-stats strong {
+  width: auto;
+  height: auto;
+  min-height: 50px;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  clip-path: none;
+  color: #0d4437;
+  font-size: 38px;
+}
+
+.hue-stats span {
+  color: #5c604d;
+  font-size: 12px;
+}
+
+/* Danh sách di tích */
+.hue-destinations {
+  max-width: 1390px;
+  padding-top: 95px;
+}
+
+.hue-section-heading {
+  border-bottom: 1px solid #ccab7885;
+}
+
+.hue-section-kicker {
+  color: #9f6b34;
+  letter-spacing: 2.6px;
+}
+
+.hue-section-heading h2 {
+  color: #103e32;
+  font-size: clamp(34px, 3.8vw, 54px);
+}
+
+.hue-section-heading h2 em {
+  color: #b0783d;
+}
+
+.hue-section-heading > p { color: #617369; }
+
+.hue-search-panel {
+  background: #fffaf1;
+  border: 1px solid #d6c1a0;
+  border-radius: 17px;
+  box-shadow: 0 12px 36px #0c453311;
+}
+
+.hue-search-box {
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+}
+
+.hue-search-box input { color: #173e33; }
+.hue-search-icon { color: #b78b4b; }
+
+.hue-search-button {
+  background: #124738;
+  border: 1px solid #124738;
+  border-radius: 12px;
+  color: #fff9ed;
+  box-shadow: none;
+}
+
+.hue-search-button:hover { background: #21654e; }
+
+.hue-filter,
+.hue-favorites-toggle {
+  background: #fff9ee;
+  color: #18483c;
+  border: 1px solid #d9be94;
+}
+
+.hue-filter.active,
+.hue-filter:hover {
+  background: #104738;
+  color: #fff5dc;
+}
+
+.hue-results-line { border-top-color: #d5bb91; }
+
+/* Thẻ di tích */
+.hue-poi-grid { gap: 26px; }
+
+.hue-poi-card {
+  border: 1px solid #d8c09b;
+  outline: 0;
+  border-radius: 16px;
+  background: #fffaf1;
+  box-shadow: 0 12px 35px #1d3c2c14;
+}
+
+.hue-poi-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 22px 48px #153e2f28;
+}
+
+.hue-poi-visual {
+  height: 245px;
+  border-bottom: 1px solid #d6b985;
+  background: #d6d2b8;
+}
+
+.hue-poi-photo { filter: saturate(.95) contrast(1.02); }
+.hue-poi-card:hover .hue-poi-photo { filter: saturate(1.03); }
+
+.hue-poi-photo-shade {
+  background: linear-gradient(180deg, #08251d70, transparent 50%, #08251d44);
+}
+
+.hue-poi-card-index {
+  background: #0d382bc9;
+  border: 1px solid #d9b577;
+  color: #f4d69c;
+  border-radius: 7px;
+}
+
+.hue-poi-category {
+  background: #fff9e8;
+  color: #1b4639;
+  border: 1px solid #e0c494;
+}
+
+.hue-favorite {
+  background: #fff9ee;
+  color: #15503e;
+  border: 1px solid #d8be95;
+}
+
+.hue-favorite.active {
+  background: #9d392e;
+  color: #fff;
+}
+
+.hue-poi-card-content { padding: 24px; }
+.hue-poi-card-content::before { display: none; }
+
+.hue-poi-location { color: #a36e36; }
+
+.hue-poi-card h3 {
+  font: 700 24px/1.28 'Playfair Display', Georgia, serif;
+  color: #123e32;
+}
+
+.hue-poi-description { color: #68766b; }
+
+.hue-poi-card-footer {
+  border-top: 1px solid #e5d9c2;
+}
+
+.hue-poi-detail { color: #0e4b39; }
+
+.hue-more-button,
+.hue-empty button {
+  background: #0f4638;
+  border: 1px solid #c6a063;
+  color: #fff9e9;
+}
+
+/* Banner & footer */
+.hue-map-cta {
+  background:
+    radial-gradient(circle at 83% 42%, #caa25621, transparent 30%),
+    linear-gradient(120deg, #062d26, #155343 80%, #0b382d);
+  border-color: #c9a260;
+}
+
+.hue-map-cta h2 { color: #fff8ec; }
+.hue-map-cta p { color: #e0ddcb; }
+
+.hue-footer {
+  background: #062a23;
+  border-top: 1px solid #cba45c;
+}
+
+/* ============ BẢN ĐỒ ============ */
+
+.hue-map-page {
+  --lacquer-dark: #0e4033;
+  --lacquer-panel: #fff9ed;
+  --cinnabar: #a36a38;
+  --gold: #c39a58;
+  --parchment-text: #153f32;
+  --parchment-muted: #617369;
+  background: #d8d6bd;
+  font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.hue-map-page::after {
+  border: 1px solid #c89e5a55;
+  box-shadow: inset 0 0 0 3px #fff5e830;
+}
+
+.hue-map-canvas .maplibregl-canvas {
+  filter: sepia(.15) saturate(.82) contrast(1.01);
+}
+
+/* Thanh điều hướng bản đồ mới */
+.huego-imperial-map-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 35;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 clamp(20px, 5vw, 85px);
+  color: #f8edda;
+  background: linear-gradient(95deg, #07362b, #0a4334 75%, #083a2e);
+  border-bottom: 2px solid #c9a262;
+  box-shadow: 0 7px 24px #11362e2c;
+}
+
+.huego-imperial-map-brand {
+  color: #f7ddab;
+  font: 700 26px 'Playfair Display', Georgia, serif;
+  text-decoration: none;
+  letter-spacing: .8px;
+}
+
+.huego-imperial-map-brand small {
+  display: block;
+  font: 600 9px 'Be Vietnam Pro', sans-serif;
+  letter-spacing: 2px;
+  margin-top: 2px;
+  color: #d8c49d;
+}
+
+.huego-imperial-map-nav {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.huego-imperial-map-nav a,
+.huego-imperial-map-nav span {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f2e4cc;
+}
+
+.huego-imperial-map-nav .is-current {
+  border: 1px solid #d7ae6c;
+  border-radius: 22px;
+  padding: 9px 22px;
+  color: #ffdf9e;
+  background: #ffffff10;
+}
+
+.huego-imperial-map-caption {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #e3c590;
+}
+
+/* Bảng điều khiển cổ kính */
+.hue-map-sidebar {
+  top: 94px;
+  left: 20px;
+  width: min(365px, calc(100% - 86px));
+  max-height: calc(100% - 112px);
+}
+
+.hue-map-panel,
+.hue-simulator,
+.hue-map-entered {
+  background:
+    radial-gradient(circle at top right, #ead2a143, transparent 60%),
+    linear-gradient(135deg, #fffaf0, #f7ebd8);
+  border: 1px solid #c6a06a;
+  outline: 1px solid #d9bd8a80;
+  outline-offset: -5px;
+  border-radius: 19px;
+  box-shadow: 0 16px 40px #203c2d36;
+  color: #173d32;
+}
+
+.hue-map-panel { padding: 23px 20px; }
+
+.hue-map-home { color: #9a6b36; }
+.hue-map-home:hover { color: #0b4b38; }
+
+.hue-map-panel-heading {
+  border-bottom-color: #cfb17e;
+  padding-bottom: 17px;
+}
+
+.hue-map-panel-symbol {
+  background: #104737;
+  color: #f4d294;
+  border: 1px solid #c6a064;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px #15382c22;
+}
+
+.hue-map-panel-heading h2 {
+  color: #143e31;
+  font: 700 23px/1.25 'Playfair Display', Georgia, serif;
+}
+
+.hue-map-panel-heading p { color: #7a806e; }
+
+.hue-map-field-label {
+  color: #90632c;
+  letter-spacing: .5px;
+}
+
+.hue-map-page .hue-btn {
+  border-radius: 11px;
+  min-height: 44px;
+}
+
+.hue-map-page .hue-btn-primary {
+  background: #0b4b39;
+  border-color: #c69d5c;
+  color: #fff7e6;
+  box-shadow: 0 5px 16px #143f3025;
+}
+
+.hue-map-page .hue-btn-outline {
+  background: #fff9ee;
+  border-color: #d8bb88;
+  color: #14483b;
+}
+
+.hue-map-page .hue-btn-active {
+  background: #e9cc95;
+  color: #103d30;
+}
+
+.hue-map-select,
+.hue-poi-picker-trigger {
+  background: #fffdf6;
+  border: 1px solid #d1b17e;
+  border-radius: 11px;
+  color: #173e34;
+}
+
+.hue-map-status {
+  background: #e9e5d780;
+  border: 1px solid #d1b88b;
+}
+
+.hue-map-status-label { color: #155140; }
+
+.hue-map-status-kind {
+  color: #0a402e;
+  background: #e5d4a9;
+}
+
+.hue-map-status-detail { color: #536d60; }
+.hue-map-status-detail strong { color: #17483a; }
+
+.hue-map-notice {
+  color: #805724;
+  background: #fbefcc;
+  border-color: #d8bd80;
+}
+
+.hue-simulator-heading strong { color: #134435; }
+.hue-simulator-heading p,
+.hue-simulator-tip { color: #607568; }
+
+.hue-poi-picker-list {
+  background: #fffaf0;
+  border: 1px solid #cba366;
+}
+
+.hue-poi-picker-option { color: #1c4c3d; }
+.hue-poi-picker-option:hover { background: #e8d6b8; color: #123d31; }
+
+/* Tìm kiếm trực tiếp trên bản đồ */
+.huego-map-search { margin-bottom: 18px; }
+
+.huego-map-search input {
+  width: 100%;
+  height: 45px;
+  border: 1px solid #d1b07b;
+  border-radius: 12px;
+  outline: none;
+  padding: 0 14px;
+  background: #fffdf6;
+  color: #193e33;
+  font: 500 12px 'Be Vietnam Pro', sans-serif;
+}
+
+.huego-map-search input:focus {
+  border-color: #1b604c;
+  box-shadow: 0 0 0 3px #1c604b1a;
+}
+
+.huego-map-results {
+  margin-top: 6px;
+  border: 1px solid #d9c29c;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fffdf8;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.huego-map-results button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid #e5dac7;
+  background: transparent;
+  padding: 11px 13px;
+  color: #1c4b3c;
+  cursor: pointer;
+}
+
+.huego-map-results button:hover { background: #f1e5d1; }
+
+/* Nút điều khiển MapLibre */
+.hue-map-page .maplibregl-ctrl-top-right {
+  top: 90px;
+  right: 12px;
+}
+
+.hue-map-page .maplibregl-ctrl-group {
+  background: #fffaf0 !important;
+  border: 1px solid #caa467 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px #153b3126 !important;
+}
+
+.hue-map-page .maplibregl-ctrl-group button {
+  filter: none;
+  border-bottom-color: #d9c39d !important;
+}
+
+/* Thẻ chi tiết nổi ngang trên bản đồ */
+.hue-poi-sheet {
+  right: 26px;
+  bottom: 24px;
+  width: min(850px, calc(100% - 430px));
+  min-height: 245px;
+  display: grid;
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  background: #fff9ee;
+  border: 1px solid #ca9d60;
+  outline: 1px solid #d6b77d;
+  outline-offset: -5px;
+  border-radius: 20px;
+  box-shadow: 0 18px 52px #15352c44;
+  color: #153e31;
+}
+
+.hue-poi-sheet-photo {
+  height: 100%;
+  min-height: 245px;
+  border-right: 1px solid #cca56d;
+  border-bottom: none;
+  background: #d5c1a0;
+}
+
+.hue-poi-sheet-photo img {
+  filter: saturate(.97);
+}
+
+.hue-poi-sheet-body {
+  padding: 27px 26px;
+}
+
+.hue-poi-sheet-kicker { color: #a37134; }
+
+.hue-poi-sheet h3 {
+  color: #164336;
+  font: 700 29px/1.2 'Playfair Display', Georgia, serif;
+}
+
+.hue-poi-sheet p { color: #5f7066; }
+
+.hue-poi-sheet-close {
+  background: #fff7e6;
+  color: #164535;
+  border: 1px solid #c69e65;
+}
+
+.hue-poi-sheet-detail {
+  color: #14513f;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.hue-map-entered h3 { color: #174335; }
+.hue-map-entered p { color: #586f60; }
+.hue-map-eyebrow { color: #98672d; }
+
+.hue-map-page .hue-audio-player {
+  background: linear-gradient(145deg, #fffaf0, #f4e7d3);
+  color: #133f32;
+  border-color: #c9a163;
+}
+
+.hue-map-page .hue-audio-heading h3 { color: #134334; }
+.hue-map-page .hue-audio-description { color: #577064; }
+.hue-map-page .hue-audio-meta { color: #6c7669; }
+
+/* ============ CHI TIẾT DI TÍCH ============ */
+
+.huego-detail-page {
+  background:
+    radial-gradient(circle at 5% 20%, #e1ca9f32, transparent 35%),
+    #f7efe2;
+  color: #173d31;
+  font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.huego-detail-card {
+  border: 1px solid #d2b486;
+  border-radius: 20px;
+  background: #fffaf1;
+  box-shadow: 0 22px 65px #163c3022;
+}
+
+.huego-detail-hero {
+  background: linear-gradient(135deg, #0b4233, #3e6951);
+}
+
+.huego-detail-gradient {
+  background: linear-gradient(0deg, #082f28ed, #082f2850 58%, transparent);
+}
+
+.huego-detail-hero-text h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.huego-detail-story h2,
+.huego-detail-aside h2 { color: #154837; }
+
+.huego-detail-narration {
+  background: #f1e7d5;
+  border: 1px solid #d9bd8b;
+}
+
+.huego-detail-narration-copy h3 { color: #124837; }
+
+.huego-detail-aside {
+  background: #f9f0e2;
+  border: 1px solid #dfc49c;
+}
+
+.huego-detail-btn {
+  background: #124a39;
+  border-color: #b99154;
+  color: #fff9e9;
+}
+
+.huego-detail-btn:hover { background: #1c644b; }
+
+/* ============ ADMIN & DI ĐỘNG ============ */
+
+.admin-layout > div:first-child {
+  background: linear-gradient(170deg, #073b2e, #082920) !important;
+  border-right: 2px solid #c59b52;
+}
+
+.admin-layout > div:first-child h2 {
+  color: #edca89 !important;
+}
+
+.admin-layout > div:last-child {
+  background: #f8f1e7 !important;
+}
+
+.huego-mobile-nav {
+  background: linear-gradient(180deg, #0c4737, #062d23) !important;
+  border-top-color: #caa363 !important;
+}
+
+.huego-mobile-nav__item.is-active {
+  background: #c69d5235 !important;
+  color: #f4d49a !important;
+  border-color: #c59b52 !important;
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 1100px) {
+  .hue-poi-sheet {
+    width: min(420px, calc(100% - 390px));
+    display: block;
+    min-height: 0;
+  }
+
+  .hue-poi-sheet-photo {
+    height: 145px;
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid #cba267;
+  }
+
+  .hue-poi-sheet-body { padding: 18px; }
+  .hue-poi-sheet h3 { font-size: 23px; }
+}
+
+@media (max-width: 767px) {
+  .huego-imperial-map-header {
+    height: 57px;
+    padding: 0 15px;
+  }
+
+  .huego-imperial-map-brand { font-size: 20px; }
+  .huego-imperial-map-brand small { display: none; }
+  .huego-imperial-map-nav { gap: 14px; }
+  .huego-imperial-map-nav a,
+  .huego-imperial-map-nav span { font-size: 11px; }
+
+  .huego-imperial-map-nav .is-current {
+    padding: 7px 11px;
+  }
+
+  .huego-imperial-map-caption { display: none; }
+
+  .hue-map-sidebar {
+    top: 66px;
+    left: 10px;
+    max-height: min(62dvh, calc(100% - 78px));
+  }
+
+  .hue-map-page .maplibregl-ctrl-top-right {
+    top: 65px;
+    right: 5px;
+  }
+
+  .hue-poi-sheet {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-height: min(48dvh, 440px);
+    overflow-y: auto;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+
+  .hue-poi-sheet-photo { height: 135px; }
+  .hue-poi-sheet-body { padding: 17px; }
+  .hue-poi-sheet h3 { font-size: 21px; }
+
+  .hue-hero {
+    min-height: 550px;
+    background-image:
+      linear-gradient(90deg, #062e27ec, #082f28b0),
+      url('../assets/hero.png');
+    background-position: center;
+  }
+
+  .hue-stats {
+    width: calc(100% - 20px);
+    margin-top: -20px;
+    padding: 17px 10px;
+    border-radius: 16px;
+  }
+
+  .hue-stats strong { font-size: 27px; }
+  .hue-poi-grid { gap: 18px; }
+  .hue-poi-visual { height: 220px; }
+}
+
+@media (max-width: 390px) {
+  .huego-imperial-map-nav { gap: 7px; }
+  .huego-imperial-map-nav a,
+  .huego-imperial-map-nav span { font-size: 10px; }
+  .huego-imperial-map-nav .is-current { padding: 6px 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hue-home *,
+  .hue-map-page *,
+  .huego-detail-page * {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
