@@ -13,7 +13,8 @@ import GpsSimulator from '../../components/GpsSimulator';
 import AudioPlayerBar from '../../components/AudioPlayerBar';
 import { getPoiImage, getCuratedPhoto, FALLBACK_IMAGE } from '../../utils/poiImages';
 import ImperialMapHeader, {
-  ImperialMapSearch
+  ImperialMapSearch,
+  ImperialMapLegend
 } from '../../components/ImperialMapUI';
 
 maplibregl.setWorkerUrl(workerUrl);
@@ -167,26 +168,33 @@ if (!map.getLayer('geofence-fill')) {
 
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = valid.map(p => {
-      const btn = document.createElement('button');
-      btn.classList.add('regal-map-pin');
-      btn.type = 'button';
+const btn = document.createElement('button');
+
+btn.type = 'button';
+btn.className = 'regal-map-pin';
+btn.dataset.poiId = String(p.id);
+btn.title = p.name;
+btn.setAttribute('aria-label', `Khám phá ${p.name}`);
+
 btn.innerHTML = `
-  <svg viewBox="0 0 24 24"
-       width="23" height="23"
+  <svg viewBox="0 0 32 32"
+       width="25" height="25"
        fill="none"
        stroke="currentColor"
-       stroke-width="1.8"
-       stroke-linecap="round"
+       stroke-width="1.6"
        stroke-linejoin="round"
        aria-hidden="true">
-    <path d="M2 9 12 3l10 6H2Z"/>
-    <path d="M4 10v9M8 10v9M16 10v9M20 10v9"/>
-    <path d="M2 21h20M11 21v-7h2v7"/>
+    <path d="M3 13 9 9H23L29 13Z"/>
+    <path d="M10 8 13 5H19L22 8Z"/>
+    <path d="M15 5 16 2 17 5"/>
+    <path d="M5 14V26H27V14"/>
+    <path d="M3 27H29M2 30H30"/>
+    <path d="M14 26V20Q14 17 16 17Q18 17 18 20V26"/>
+    <path d="M8 16V24M11 16V24M21 16V24M24 16V24"/>
   </svg>
-`;      btn.title = p.name;
-      btn.setAttribute('aria-label', p.name);
-      btn.style.cssText = 'background:linear-gradient(135deg,#8b1e1e,#3b0d0d);border:2px solid #d4af37;color:#ffe27a;border-radius:50%;width:40px;height:40px;font-size:19px;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 12px rgba(20,10,5,.55),0 0 0 3px rgba(212,175,55,.28)';
-      btn.onclick = () => setActivePoiRef.current(p);
+`;
+
+btn.onclick = () => setActivePoiRef.current(p);
       return new maplibregl.Marker({ element: btn, anchor: 'center' })
         .setLngLat([p.lng, p.lat]).addTo(map);
     });
@@ -252,7 +260,16 @@ btn.innerHTML = `
       repaintOfflineRef.current();
     }
   }, [offlineMode]);
+useEffect(() => {
+  markersRef.current.forEach(marker => {
+    const element = marker.getElement();
 
+    element.classList.toggle(
+      'is-active',
+      element.dataset.poiId === String(activePoi?.id)
+    );
+  });
+}, [activePoi?.id, pois]);
   useEffect(() => {
     // POIs can be loaded/updated while offline without a style change.
     repaintPoisRef.current();
@@ -284,6 +301,29 @@ btn.innerHTML = `
     }
   };
   const simulate=(p)=>{disableGps();setSimOn(true);setGpsError('');setEntered(null);watcherRef.current.reset();setUserPosition(p);mapRef.current?.flyTo({center:[p.lng,p.lat],zoom:16});if(window.matchMedia('(max-width:640px)').matches)setControlsExpanded(false);};
+  const fitAllPois = (items = pois) => {
+  const map = mapRef.current;
+  if (!map) return;
+  const coords = items
+    .map(p => [Number(p.lng), Number(p.lat)])
+    .filter(([lng, lat]) => Number.isFinite(lng) && Number.isFinite(lat)
+      && Math.abs(lng) <= 180 && Math.abs(lat) <= 90);
+  if (!coords.length) return;
+  if (coords.length === 1) {
+    map.flyTo({ center: coords[0], zoom: 15, essential: true });
+    return;
+  }
+  const bounds = new maplibregl.LngLatBounds(coords[0], coords[0]);
+  coords.forEach(coord => bounds.extend(coord));
+  const isDesktop = window.innerWidth >= 768;
+  map.fitBounds(bounds, {
+    padding: isDesktop
+      ? { top: 110, right: 260, bottom: 85, left: 465 }
+      : { top: 85, right: 30, bottom: 100, left: 30 },
+    maxZoom: 14,
+    duration: 850
+  });
+};
   return (
     <div className="hue-map-page">
 
@@ -306,6 +346,7 @@ btn.innerHTML = `
 
       <div ref={nodeRef} className="hue-map-canvas" />
       <ImperialMapHeader language={currentLanguage} />
+      {!activePoi && <ImperialMapLegend pois={pois} />}
       {offlineMode && (
         <div aria-label="Các di tích trên sơ đồ ngoại tuyến" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 5, overflow: 'hidden' }}>
           <svg aria-hidden="true" style={{ width: '100%', height: '100%', position: 'absolute', inset: 0, overflow: 'hidden' }}>
@@ -345,7 +386,7 @@ btn.innerHTML = `
           <div className="hue-map-panel-heading">
             <div className="hue-map-panel-symbol">⌖</div>
             <div>
-              <h2>Khám phá Huế</h2>
+              <h2>Bản đồ di sản Huế</h2>
               <p>Bản đồ di sản & thuyết minh</p>
             </div>
             <button type="button" className="hue-mobile-toggle" aria-label={controlsExpanded ? "Thu gọn bảng điều khiển" : "Mở bảng điều khiển"} aria-expanded={controlsExpanded} onClick={() => setControlsExpanded(v => !v)}>
@@ -354,6 +395,9 @@ btn.innerHTML = `
           </div>
           <div className="hue-map-control-details">
             <ImperialMapSearch
+            selectedPoiId={activePoi?.id}
+userPosition={userPosition}
+onFitAll={fitAllPois}
   pois={pois}
   onSelect={poi => {
     setActivePoi(poi);

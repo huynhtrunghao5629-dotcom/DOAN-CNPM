@@ -9,14 +9,16 @@ export default defineConfig({
   server: {
     port: 5173,
     allowedHosts: ['.trycloudflare.com'],
-    proxy: {
-      '/uploads': { target: 'http://localhost:5278', changeOrigin: true, secure: false },
-      '/api': {
-        target: 'http://localhost:5278', 
-        changeOrigin: true,
-        secure: false 
-      }
-    }
+proxy: {
+  '/uploads': {
+    target: 'http://127.0.0.1:5278',
+    changeOrigin: true,
+  },
+  '/api': {
+    target: 'http://127.0.0.1:5278',
+    changeOrigin: true,
+  },
+},
   },
   // For local PWA preview only: proxy API to the development backend.
   preview: {
