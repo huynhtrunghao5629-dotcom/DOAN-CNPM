@@ -62,4 +62,32 @@ public class AuthController : ControllerBase
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+
+    [HttpPost("seed-admin")]
+public async Task<IActionResult> SeedAdmin()
+{
+    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "admin123@gmail.com");
+    if (existingUser != null)
+    {
+        _context.Users.Remove(existingUser);
+    }
+
+    var admin = new User
+    {
+        Id = Guid.NewGuid().ToString(),
+        Email = "admin123@gmail.com",
+        FullName = "Admin",
+        HashedPassword = BCrypt.Net.BCrypt.HashPassword("admin123456789"),
+        PhoneNumber = "0901234567",
+        RoleCode = "ADMIN",
+        IsActive = true,
+        CreatedAt = DateTime.UtcNow
+    };
+
+    _context.Users.Add(admin);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "Đã tạo tài khoản admin thành công!", hash = admin.HashedPassword });
 }
+}
+
