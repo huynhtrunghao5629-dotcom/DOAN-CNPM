@@ -50,6 +50,17 @@ export default function AudioPlayerBar() {
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   }, []);
 
+useEffect(() => {
+  if (!playing) return;
+
+  const timer = setTimeout(() => {
+    stopPlayback();
+    setMessage("hello");
+  }, 5000);
+
+  return () => clearTimeout(timer);
+}, [playing, activePoi?.id, currentLanguage]);
+
   if (!activePoi) return null;
 
   const speak = () => {

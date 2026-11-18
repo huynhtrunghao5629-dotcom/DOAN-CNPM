@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { usePoiStore } from '../../stores/poiStore';
 import { adminApi } from '../services/adminApi';
-
+import { apiRequest } from '../services/api';
+import { normalizePoi } from '../services/userApi';
 const initialForm = {
   name: '',
   description: '',
@@ -12,6 +13,8 @@ const initialForm = {
   isActive: true,
   images: [],
   narrations: {},
+  category: 'Di tích lịch sử',
+address: '',
 };
 
 export default function POIManager() {
@@ -51,6 +54,8 @@ export default function POIManager() {
       isActive: poi.isActive ?? true,
       images: Array.isArray(poi.images) ? [...poi.images] : [],
       narrations: poi.narrations || (poi.narration ? { vi: { text: poi.narration, audioUrl: '' } } : {}),
+      category: poi.category || 'Di tích lịch sử',
+address: poi.address || '',
     });
 
     setEditingId(poi.id);
@@ -80,8 +85,7 @@ export default function POIManager() {
         lat < -90 || lat > 90 || lng < -180 || lng > 180 || radius <= 0) {
       setMessage('Vui lòng kiểm tra tên, tọa độ và bán kính.'); return;
     }
-    const payload = { ...form, lat, lng, radius, category: 'Di tích lịch sử' };
-    setSaving(true);
+const payload = { ...form, lat, lng, radius };    setSaving(true);
     try {
       let saved;
       if (editingId !== null) saved = await adminApi.updatePoi(editingId, payload);
