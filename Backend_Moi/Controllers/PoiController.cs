@@ -134,6 +134,7 @@ private async Task SaveNarrationsAsync(string poiId,
         }
 
         // 3. Tạo mới POI (Chỉ Admin hoặc Poi Owner mới được tạo)
+        // 3. Tạo mới POI (POST /api/v1/pois)
         [HttpPost]
         [Authorize(Roles = "admin,super_admin")]
         public async Task<IActionResult> CreatePoi([FromBody] CreatePoiDto dto)
@@ -155,7 +156,59 @@ private async Task SaveNarrationsAsync(string poiId,
             await _context.SaveChangesAsync();
             if (dto.Narrations != null)
                 await SaveNarrationsAsync(newPoi.Id, dto.Narrations);
-            return StatusCode(201, (await WithNarrationsAsync(new[] { newPoi })).First());
+
+            var warnings = await GetOverlapWarningsAsync(
+                newPoi.Id,
+                newPoi.Latitude,
+                newPoi.Longitude,
+                newPoi.Radius
+            );
+
+            return StatusCode(201, new
+            {
+                message = warnings.Count > 0
+                    ? $"Thêm thành công! ⚠️ CẢNH BÁO GIAO VÙNG ĐỊNH VỊ: {string.Join("; ", warnings)}"
+                    : "Thêm điểm tham quan thành công",
+                overlapWarnings = warnings,
+                data = (await WithNarrationsAsync(new[] { newPoi })).First()
+            });
+        }
+
+        // 4. Cập nhật POI (PUT /api/v1/pois/{id})
+        [HttpPut("{id}")]
+        [Authorize(Roles = "admin,super_admin,poi_owner")]
+        private static double CalculateDistanceMeters(double lat1, double lon1, double lat2, double lon2)
+        {
+            const double R = 6371000;
+            var dLat = (lat2 - lat1) * Math.PI / 180.0;
+            var dLon = (lon2 - lon1) * Math.PI / 180.0;
+            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(lat1 * Math.PI / 180.0) * Math.Cos(lat2 * Math.PI / 180.0) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
+
+        private async Task<List<string>> GetOverlapWarningsAsync(string? excludeId, double lat, double lng, double? radius)
+        {
+            var r1 = radius ?? 50;
+            var otherPois = await _context.Pois
+                .AsNoTracking()
+                .Where(p => p.IsActive && (excludeId == null || p.Id != excludeId))
+                .ToListAsync();
+
+            var warnings = new List<string>();
+            foreach (var p in otherPois)
+            {
+                var r2 = p.Radius ?? 50;
+                var dist = CalculateDistanceMeters(lat, lng, p.Latitude, p.Longitude);
+                if (dist <= r1 + r2)
+                {
+                    var overlap = Math.Round((r1 + r2) - dist);
+                    warnings.Add($"Giao với '{p.Name}' (cách {Math.Round(dist)}m, phần giao {overlap}m)");
+                }
+            }
+            return warnings;
         }
 
         // 4. Cập nhật POI (PUT /api/v1/pois/{id})
@@ -185,9 +238,19 @@ private async Task SaveNarrationsAsync(string poiId,
             if (dto.Narrations != null)
                 await SaveNarrationsAsync(existingPoi.Id, dto.Narrations);
 
+            var warnings = await GetOverlapWarningsAsync(
+                existingPoi.Id,
+                existingPoi.Latitude,
+                existingPoi.Longitude,
+                existingPoi.Radius
+            );
+
             return Ok(new
             {
-                message = "Cập nhật điểm tham quan thành công",
+                message = warnings.Count > 0
+                    ? $"Cập nhật thành công! ⚠️ CẢNH BÁO GIAO VÙNG ĐỊNH VỊ: {string.Join("; ", warnings)}"
+                    : "Cập nhật điểm tham quan thành công",
+                overlapWarnings = warnings,
                 data = (await WithNarrationsAsync(new[] { existingPoi })).First()
             });
         }

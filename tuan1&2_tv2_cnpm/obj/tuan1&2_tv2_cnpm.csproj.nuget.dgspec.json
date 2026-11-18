@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\tuan1&2_tv2_cnpm\\tuan1&2_tv2_cnpm.csproj": {}
+    "E:\\Hue_AutoTranslate\\DOAN-CNPM\\tuan1&2_tv2_cnpm\\tuan1&2_tv2_cnpm.csproj": {}
   },
   "projects": {
-    "D:\\tuan1&2_tv2_cnpm\\tuan1&2_tv2_cnpm.csproj": {
+    "E:\\Hue_AutoTranslate\\DOAN-CNPM\\tuan1&2_tv2_cnpm\\tuan1&2_tv2_cnpm.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\tuan1&2_tv2_cnpm\\tuan1&2_tv2_cnpm.csproj",
+        "projectUniqueName": "E:\\Hue_AutoTranslate\\DOAN-CNPM\\tuan1&2_tv2_cnpm\\tuan1&2_tv2_cnpm.csproj",
         "projectName": "tuan1&2_tv2_cnpm",
-        "projectPath": "D:\\tuan1&2_tv2_cnpm\\tuan1&2_tv2_cnpm.csproj",
-        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "D:\\tuan1&2_tv2_cnpm\\obj\\",
+        "projectPath": "E:\\Hue_AutoTranslate\\DOAN-CNPM\\tuan1&2_tv2_cnpm\\tuan1&2_tv2_cnpm.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "E:\\Hue_AutoTranslate\\DOAN-CNPM\\tuan1&2_tv2_cnpm\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,7 +22,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -97,7 +92,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.402/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

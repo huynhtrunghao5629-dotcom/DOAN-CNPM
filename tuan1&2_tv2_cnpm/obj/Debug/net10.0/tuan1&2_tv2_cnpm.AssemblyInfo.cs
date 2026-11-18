@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("tuan1&2_tv2_cnpm")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eab202d3a0f428733a69aa6beff70965bf90774c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b641809ffcd0c720105262696600a1dbb0818aaa")]
 [assembly: System.Reflection.AssemblyProductAttribute("tuan1&2_tv2_cnpm")]
 [assembly: System.Reflection.AssemblyTitleAttribute("tuan1&2_tv2_cnpm")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
